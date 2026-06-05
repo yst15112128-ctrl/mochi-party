@@ -486,8 +486,37 @@
 </head>
 <body>
 <div id="app"></div>
+<div id="debug-banner" style="display:none;position:fixed;top:0;left:0;right:0;background:#fee;border-bottom:2px solid #c00;color:#900;padding:12px 14px;font-size:12px;font-family:monospace;z-index:9999;max-height:50vh;overflow:auto;line-height:1.5;"></div>
 
 <script type="module">
+// ============ Debug overlay ============
+function showDebug(msg) {
+  const b = document.getElementById('debug-banner');
+  if (!b) return;
+  b.style.display = 'block';
+  const line = document.createElement('div');
+  line.textContent = msg;
+  line.style.marginBottom = '6px';
+  b.appendChild(line);
+  // 加關閉按鈕（第一次）
+  if (!b.dataset.hasClose) {
+    b.dataset.hasClose = '1';
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '關閉';
+    closeBtn.style.cssText = 'position:absolute;top:6px;right:6px;background:#c00;color:white;border:none;border-radius:4px;padding:4px 10px;font-size:12px;';
+    closeBtn.onclick = () => { b.style.display = 'none'; };
+    b.appendChild(closeBtn);
+  }
+}
+
+window.addEventListener('error', (e) => {
+  showDebug('JS Error: ' + (e.message || e.error || 'unknown'));
+});
+window.addEventListener('unhandledrejection', (e) => {
+  const reason = e.reason || {};
+  showDebug('Promise Error: ' + (reason.code || '') + ' ' + (reason.message || JSON.stringify(reason)).slice(0, 300));
+});
+
 // ============ Firebase ============
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import {
@@ -495,16 +524,24 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAd1i8aP2XTtJ_CdVlwrSkF_1gUWfeb-q8",
-  authDomain: "mochi-game-c9b8f.firebaseapp.com",
-  projectId: "mochi-game-c9b8f",
-  storageBucket: "mochi-game-c9b8f.firebasestorage.app",
-  messagingSenderId: "237145739418",
-  appId: "1:237145739418:web:97d3a0bd4ab9a4f80c4e0e"
+  apiKey: "AIzaSyCAH9vzwJbPvqQe660nBv8qscUyynoXnJw",
+  authDomain: "mochi-party.firebaseapp.com",
+  projectId: "mochi-party",
+  storageBucket: "mochi-party.firebasestorage.app",
+  messagingSenderId: "1051968798417",
+  appId: "1:1051968798417:web:69bdcd9942d61650178ff0"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+showDebug('Firebase config OK, projectId: ' + firebaseConfig.projectId);
+
+let app, db;
+try {
+  app = initializeApp(firebaseConfig);
+  db = getFirestore(app);
+  showDebug('Firebase initialized OK');
+} catch (e) {
+  showDebug('Firebase init failed: ' + e.message);
+}
 
 // ============ Question Bank (150) ============
 const QUESTIONS = [
