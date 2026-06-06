@@ -1,0 +1,2661 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#1a1a1a">
+<title>默契猜猜 派對版</title>
+<style>
+  :root {
+    --bg: #faf7f2;
+    --card: #ffffff;
+    --card-light: #f5f0e8;
+    --ink: #2a2a2a;
+    --muted: #8a8378;
+    --line: #ece6dc;
+    --accent: #e07856;       /* 主色：默契猜猜的橘紅 */
+    --pink: #c75d7e;
+    --purple: #7b6aa1;
+    --red: #c54545;
+    --green: #7a9e5f;
+    --gold: #d4a84b;
+    --blue: #6b8e9e;
+    --soft-pink: #f7dde5;
+    --soft-purple: #e4dff0;
+    --soft-orange: #fce8df;
+    --soft-blue: #dee9ed;
+    --soft-gold: #f7ebcb;
+    --soft-red: #fde0e0;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  #app {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 20px 16px 40px;
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 18px;
+  }
+  .title {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .header-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .menu-btn {
+    background: none;
+    border: none;
+    color: var(--ink);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 6px 8px;
+    line-height: 1;
+    border-radius: 6px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
+  /* Buttons */
+  .btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: 12px;
+    border: none;
+    background: var(--ink);
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.15s;
+  }
+  .btn:active { opacity: 0.7; }
+  .btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink);
+    border: 1.5px solid var(--line);
+  }
+  .btn-danger {
+    background: var(--red);
+    color: white;
+  }
+  .btn-accent {
+    background: var(--accent);
+    color: white;
+  }
+  .btn-small {
+    padding: 8px 14px;
+    font-size: 12px;
+    width: auto;
+  }
+
+  /* Inputs */
+  .input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1.5px solid var(--line);
+    background: white;
+    color: var(--ink);
+    font-size: 15px;
+    font-family: inherit;
+  }
+  .input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  /* Question */
+  .question {
+    font-size: 19px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+
+  /* Options */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .option {
+    background: var(--bg);
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: var(--ink);
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .option:active { opacity: 0.7; }
+  .option.selected {
+    background: var(--ink);
+    color: white;
+    border-color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* Category tag */
+  .cat-tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  /* Player chip */
+  .player-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 14px;
+    background: var(--card-light);
+    border: 1px solid var(--line);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .player-chip.me {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+  .player-chip.offline { opacity: 0.45; }
+  .player-emoji { font-size: 16px; }
+  .player-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+  }
+  .player-dot.answered { background: var(--accent); }
+  .player-dot.offline { background: var(--muted); }
+
+  /* Timer */
+  .timer-wrap { margin-bottom: 14px; }
+  .timer-label {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--muted);
+    margin-bottom: 6px; letter-spacing: 0.5px;
+  }
+  .timer-bar {
+    height: 6px; background: var(--line);
+    border-radius: 3px; overflow: hidden;
+  }
+  .timer-fill {
+    height: 100%; border-radius: 3px;
+    transition: width 0.95s linear, background-color 0.3s;
+  }
+
+  /* Banner */
+  .banner {
+    border-radius: 14px;
+    padding: 14px 16px;
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 14px;
+    font-size: 14px;
+  }
+  .banner-drink {
+    background: var(--soft-pink);
+    color: var(--pink);
+  }
+  .banner-correct {
+    background: #e6f0db;
+    color: var(--green);
+  }
+  .banner-streak {
+    background: var(--soft-orange);
+    color: var(--accent);
+  }
+
+  /* Reveal row */
+  .reveal-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+    align-items: center;
+  }
+  .reveal-row:last-child { border-bottom: none; }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .modal {
+    background: white;
+    border-radius: 18px;
+    padding: 22px;
+    max-width: 340px;
+    width: 100%;
+    color: var(--ink);
+  }
+
+  /* Emoji grid */
+  .emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+  }
+  .emoji-tile {
+    aspect-ratio: 1;
+    border: 2px solid var(--line);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    cursor: pointer;
+    background: white;
+  }
+  .emoji-tile.selected {
+    border-color: var(--accent);
+    background: var(--soft-orange);
+  }
+
+  /* Ranking */
+  .rank-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--card-light);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    align-items: center;
+  }
+  .rank-num {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--muted);
+    width: 32px;
+    text-align: center;
+  }
+  .rank-num.first { color: var(--gold); }
+  .rank-num.second { color: #a8a8a8; }
+  .rank-num.third { color: #b87333; }
+  .rank-score {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  /* Drink animation */
+  @keyframes bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+  .drink-icon {
+    display: inline-block;
+    animation: bounce 0.6s ease-in-out 2;
+  }
+
+  /* ============ Dice Game ============ */
+  .dice-stage {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 28px 16px;
+    margin-bottom: 14px;
+    min-height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    perspective: 800px;
+  }
+
+  .dice {
+    width: 50px;
+    height: 50px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 1.6s cubic-bezier(0.3, 0.5, 0.4, 1);
+  }
+  .dice.rolling {
+    animation: spin 0.4s linear infinite;
+  }
+  @keyframes spin {
+    0%   { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+    50%  { transform: rotateX(360deg) rotateY(180deg) rotateZ(90deg); }
+    100% { transform: rotateX(720deg) rotateY(360deg) rotateZ(180deg); }
+  }
+
+  .dice-face {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: white;
+    border: 2px solid var(--ink);
+    border-radius: 9px;
+    display: grid;
+    padding: 5px;
+  }
+  .dice-pip {
+    width: 7px;
+    height: 7px;
+    background: var(--ink);
+    border-radius: 50%;
+    align-self: center;
+    justify-self: center;
+  }
+
+  .dface-1 { grid-template-areas: ". . ." ". c ." ". . ."; }
+  .dface-1 .dice-pip:nth-child(1) { grid-area: c; }
+  .dface-2 { grid-template-areas: "a . ." ". . ." ". . b"; }
+  .dface-2 .dice-pip:nth-child(1) { grid-area: a; }
+  .dface-2 .dice-pip:nth-child(2) { grid-area: b; }
+  .dface-3 { grid-template-areas: "a . ." ". b ." ". . c"; }
+  .dface-3 .dice-pip:nth-child(1) { grid-area: a; }
+  .dface-3 .dice-pip:nth-child(2) { grid-area: b; }
+  .dface-3 .dice-pip:nth-child(3) { grid-area: c; }
+  .dface-4 { grid-template-areas: "a . b" ". . ." "c . d"; }
+  .dface-4 .dice-pip:nth-child(1) { grid-area: a; }
+  .dface-4 .dice-pip:nth-child(2) { grid-area: b; }
+  .dface-4 .dice-pip:nth-child(3) { grid-area: c; }
+  .dface-4 .dice-pip:nth-child(4) { grid-area: d; }
+  .dface-5 { grid-template-areas: "a . b" ". c ." "d . e"; }
+  .dface-5 .dice-pip:nth-child(1) { grid-area: a; }
+  .dface-5 .dice-pip:nth-child(2) { grid-area: b; }
+  .dface-5 .dice-pip:nth-child(3) { grid-area: c; }
+  .dface-5 .dice-pip:nth-child(4) { grid-area: d; }
+  .dface-5 .dice-pip:nth-child(5) { grid-area: e; }
+  .dface-6 { grid-template-areas: "a . b" "c . d" "e . f"; }
+  .dface-6 .dice-pip:nth-child(1) { grid-area: a; }
+  .dface-6 .dice-pip:nth-child(2) { grid-area: b; }
+  .dface-6 .dice-pip:nth-child(3) { grid-area: c; }
+  .dface-6 .dice-pip:nth-child(4) { grid-area: d; }
+  .dface-6 .dice-pip:nth-child(5) { grid-area: e; }
+  .dface-6 .dice-pip:nth-child(6) { grid-area: f; }
+
+  .dice-face.front  { transform: translateZ(25px); }
+  .dice-face.back   { transform: rotateY(180deg) translateZ(25px); }
+  .dice-face.right  { transform: rotateY(90deg) translateZ(25px); }
+  .dice-face.left   { transform: rotateY(-90deg) translateZ(25px); }
+  .dice-face.top    { transform: rotateX(90deg) translateZ(25px); }
+  .dice-face.bottom { transform: rotateX(-90deg) translateZ(25px); }
+
+  .dice.killer-hit .dice-face {
+    border-color: var(--accent);
+    background: var(--soft-orange);
+  }
+  .dice.killer-hit .dice-pip {
+    background: var(--accent);
+  }
+
+  .killer-card {
+    background: var(--soft-orange);
+    border: 1px dashed var(--accent);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .killer-num {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  /* Misc */
+  .center { text-align: center; }
+  .muted { color: var(--muted); }
+  .row { display: flex; gap: 8px; align-items: center; }
+  .gap-tight { gap: 4px; }
+  .stack { display: flex; flex-direction: column; gap: 8px; }
+  .small { font-size: 12px; }
+  .tiny { font-size: 11px; }
+
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script type="module">
+// ============ Firebase ============
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import {
+  getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCAH9vzwJbPvqQe660nBv8qscUyynoXnJw",
+  authDomain: "mochi-party.firebaseapp.com",
+  projectId: "mochi-party",
+  storageBucket: "mochi-party.firebasestorage.app",
+  messagingSenderId: "1051968798417",
+  appId: "1:1051968798417:web:69bdcd9942d61650178ff0"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ============ Question Bank (150) ============
+const QUESTIONS = [
+  // truth (40)
+  { cat: 'truth', q: "上次說「我愛你」是對誰說的？", a: "現任/曖昧對象", b: "寵物" },
+  { cat: 'truth', q: "比較常做的壞女人/壞男人行為？", a: "已讀不回", b: "故意吊著對方" },
+  { cat: 'truth', q: "比較常的線上習慣？", a: "偷看別人手機通知", b: "把不喜歡的朋友訊息靜音" },
+  { cat: 'truth', q: "對前任比較常的感覺？", a: "希望他過得不好", b: "希望他偶爾想起我" },
+  { cat: 'truth', q: "比較常一個人偷偷做？", a: "哭", b: "唱歌" },
+  { cat: 'truth', q: "對哪種人最容易心軟？", a: "長得不錯但渣的人", b: "對我超好但我沒感覺的人" },
+  { cat: 'truth', q: "你比較常騙別人？", a: "「我沒事」", b: "「我超忙」" },
+  { cat: 'truth', q: "比較難對外承認？", a: "我其實單身很久了", b: "我其實很缺安全感" },
+  { cat: 'truth', q: "喝醉後比較容易？", a: "傳訊息給前任", b: "哭給朋友看" },
+  { cat: 'truth', q: "比較常的小謊？", a: "「我在路上了」", b: "「我已經吃過了」" },
+  { cat: 'truth', q: "比較會偷偷做的事？", a: "滑前任 IG", b: "滑暗戀對象 IG" },
+  { cat: 'truth', q: "上次哭是因為？", a: "工作/錢", b: "感情" },
+  { cat: 'truth', q: "比較常假裝？", a: "聽過某部劇/某首歌", b: "聽懂某個梗" },
+  { cat: 'truth', q: "比較尷尬被抓到的？", a: "背後說人壞話", b: "做奇怪的私下舉動" },
+  { cat: 'truth', q: "比較難承認？", a: "自己不會某件「大家都會」的事", b: "其實不喜歡某個朋友" },
+  { cat: 'truth', q: "你比較常的「逃避方式」？", a: "假裝沒看到訊息", b: "答應卻不去做" },
+  { cat: 'truth', q: "對前任最後一次主動聯絡是？", a: "一個月內", b: "超過半年" },
+  { cat: 'truth', q: "比較常的內心話？", a: "我比他/她好多了", b: "我是不是真的不夠好" },
+  { cat: 'truth', q: "看到很厲害的同齡人會？", a: "焦慮", b: "麻木無感" },
+  { cat: 'truth', q: "現在最常想的事？", a: "錢的問題", b: "感情/人際" },
+  { cat: 'truth', q: "私底下比較常?", a: "查自己星座運勢", b: "查曖昧對象的星座配對" },
+  { cat: 'truth', q: "你比較會在意？", a: "別人覺得我醜", b: "別人覺得我無趣" },
+  { cat: 'truth', q: "比較常後悔？", a: "說過的話", b: "沒說的話" },
+  { cat: 'truth', q: "有過幾次「跟不該喜歡的人喜歡」？", a: "有過", b: "現在還在進行式" },
+  { cat: 'truth', q: "比較怕別人發現？", a: "我其實沒那麼喜歡他/她", b: "我其實還沒走出上一段" },
+  { cat: 'truth', q: "你的「上癮行為」？", a: "滑手機到凌晨", b: "亂買東西" },
+  { cat: 'truth', q: "誠實說：你比較像？", a: "假裝堅強的玻璃心", b: "嘴硬但其實很在乎" },
+  { cat: 'truth', q: "最近一次說謊是？", a: "今天", b: "這週" },
+  { cat: 'truth', q: "暗中比較會做？", a: "比較自己跟前任的新對象", b: "比較自己跟朋友的伴侶" },
+  { cat: 'truth', q: "你比較常的內心 OS？", a: "幹我好累", b: "幹我好爛" },
+  { cat: 'truth', q: "比較常為什麼說謊？", a: "為了讓對方開心", b: "為了讓自己輕鬆" },
+  { cat: 'truth', q: "心動最近一次是？", a: "一個月內", b: "想不起來了" },
+  { cat: 'truth', q: "你的「秘密小帳」？", a: "有，看而已", b: "有，會發文" },
+  { cat: 'truth', q: "比較會偷偷做？", a: "查暗戀對象的所有社群", b: "查自己被封鎖了沒" },
+  { cat: 'truth', q: "你比較常假裝喜歡？", a: "某個朋友", b: "某種食物/興趣" },
+  { cat: 'truth', q: "現在這個人生階段你？", a: "覺得自己變好了", b: "覺得越來越迷惘" },
+  { cat: 'truth', q: "誠實面對：比較常想？", a: "離職", b: "分手" },
+  { cat: 'truth', q: "你有過「劈腿/被劈腿」的經驗嗎？", a: "有過", b: "沒有" },
+  { cat: 'truth', q: "比較羨慕別人的？", a: "戀愛運", b: "賺錢能力" },
+  { cat: 'truth', q: "你最近一次「裝沒事」是？", a: "今天", b: "這週" },
+  // wyr (40)
+  { cat: 'wyr', q: "感情容忍度，寧願伴侶？", a: "跟前任聯絡但沒做什麼", b: "完全切乾淨但偶爾說想念" },
+  { cat: 'wyr', q: "關於朋友，寧願知道？", a: "朋友背後對你的真實看法", b: "永遠不知道" },
+  { cat: 'wyr', q: "理想伴侶，寧願？", a: "跟現任結婚到老但平淡", b: "跟某個前任在一起但每天吵" },
+  { cat: 'wyr', q: "寧願下輩子？", a: "超漂亮但很笨", b: "很聰明但長相普通" },
+  { cat: 'wyr', q: "財富 vs 友情，寧願失去？", a: "所有朋友，但有錢", b: "很有朋友，但很窮" },
+  { cat: 'wyr', q: "伴侶選擇，寧願？", a: "是渣男渣女但對你超好", b: "人超好但沒火花" },
+  { cat: 'wyr', q: "愛情選擇題，寧願？", a: "被討厭的人愛上", b: "愛上討厭你的人" },
+  { cat: 'wyr', q: "寧願知道自己？", a: "什麼時候會死", b: "怎麼樣會死" },
+  { cat: 'wyr', q: "關於戀愛你寧願？", a: "永遠單身但生活自由", b: "每段感情都不超過半年" },
+  { cat: 'wyr', q: "寧願讓全世界知道？", a: "你的所有搜尋紀錄", b: "你的所有訊息對話" },
+  { cat: 'wyr', q: "永遠不能？", a: "洗澡", b: "刷牙" },
+  { cat: 'wyr', q: "跟前任？", a: "當朋友", b: "互刪不聯絡" },
+  { cat: 'wyr', q: "一輩子只能吃？", a: "甜的", b: "鹹的" },
+  { cat: 'wyr', q: "突然多了個能力？", a: "聽得到別人的內心話", b: "能讓自己隱形" },
+  { cat: 'wyr', q: "金錢 vs 愛情，寧願？", a: "一輩子單身但很有錢", b: "很窮但很相愛" },
+  { cat: 'wyr', q: "伴侶設定，寧願？", a: "騙過你一次但很愛你", b: "從不騙你但有點冷淡" },
+  { cat: 'wyr', q: "寧願知道？", a: "現任的所有過去", b: "現任的所有未來" },
+  { cat: 'wyr', q: "愛情你寧願？", a: "永遠不會被劈腿", b: "永遠不會分手但常吵架" },
+  { cat: 'wyr', q: "永遠不能再？", a: "用手機", b: "看電視/影音" },
+  { cat: 'wyr', q: "寧願跟誰住一起？", a: "完全陌生但乾淨的室友", b: "好朋友但很邋遢" },
+  { cat: 'wyr', q: "工作生活，寧願？", a: "每天加班但週末很爽", b: "準時下班但週末也工作" },
+  { cat: 'wyr', q: "寧願工作？", a: "錢多事多老闆機車", b: "錢少事少老闆很雷" },
+  { cat: 'wyr', q: "被在乎這件事，寧願？", a: "認識的每個人都記得你的生日", b: "都不記得但每天問你好" },
+  { cat: 'wyr', q: "永遠？", a: "聽不到音樂", b: "看不到電影/影集" },
+  { cat: 'wyr', q: "寧願出糗的場合？", a: "婚禮", b: "葬禮" },
+  { cat: 'wyr', q: "職場上你寧願？", a: "被全公司喜歡但沒升遷", b: "被討厭但升很快" },
+  { cat: 'wyr', q: "外貌 vs 壽命，寧願？", a: "永遠看起來 25 歲，但只能活到 60", b: "正常老化，但活到 100" },
+  { cat: 'wyr', q: "如果可以選，寧願？", a: "完美的記憶力（什麼都記得）", b: "選擇性遺忘的能力" },
+  { cat: 'wyr', q: "寧願跟？", a: "聊得來但長相普通的人交往", b: "超讚但聊不太起來的人交往" },
+  { cat: 'wyr', q: "友情測試，寧願？", a: "好朋友全部移民國外", b: "他們都留下但變沒以前親" },
+  { cat: 'wyr', q: "極限挑戰，寧願？", a: "三天不能睡覺", b: "三天不能吃東西" },
+  { cat: 'wyr', q: "公開場合寧願？", a: "褲子破了大洞", b: "口臭被同事提醒" },
+  { cat: 'wyr', q: "伴侶條件，寧願？", a: "比你會賺錢", b: "比你會做家事" },
+  { cat: 'wyr', q: "極端選擇，寧願？", a: "一輩子穿同一套衣服", b: "一輩子只能吃同一種食物" },
+  { cat: 'wyr', q: "超能力寧願選？", a: "能跟動物對話", b: "能聽到植物的想法" },
+  { cat: 'wyr', q: "寧願伴侶比你？", a: "個性好但長相平凡", b: "長相好但個性悶" },
+  { cat: 'wyr', q: "在朋友圈裡寧願？", a: "永遠是團體中最有錢的", b: "永遠是團體中最好看的" },
+  { cat: 'wyr', q: "寧願失去？", a: "嗅覺", b: "味覺" },
+  { cat: 'wyr', q: "你寧願？", a: "知道自己的全部缺點", b: "永遠相信自己很完美" },
+  { cat: 'wyr', q: "名氣 vs 平靜，寧願？", a: "被全國人認識但被罵", b: "完全沒人認識但有錢有閒" },
+  // savage (25)
+  { cat: 'savage', q: "比較像？", a: "自私一點", b: "玻璃心一點" },
+  { cat: 'savage', q: "朋友圈裡你比較常是？", a: "被吐槽的人", b: "吐槽別人的人" },
+  { cat: 'savage', q: "比較讓你受不了的人？", a: "太熱情的人", b: "太冷淡的人" },
+  { cat: 'savage', q: "你比較常？", a: "嘴上說好其實沒在聽", b: "直接擺臉色" },
+  { cat: 'savage', q: "比較有可能？", a: "當場崩潰大哭", b: "默默生悶氣三天" },
+  { cat: 'savage', q: "在團體中你是？", a: "愛搶話的", b: "默默觀察的" },
+  { cat: 'savage', q: "比較像哪種爛人？", a: "已讀不回的", b: "答應了卻臨時不去的" },
+  { cat: 'savage', q: "你比較會？", a: "對陌生人比對家人好", b: "對家人比對陌生人好" },
+  { cat: 'savage', q: "團體中比較像？", a: "永遠想當主角的", b: "暗中操控大家的" },
+  { cat: 'savage', q: "比較容易？", a: "嫉妒朋友", b: "嫉妒陌生人" },
+  { cat: 'savage', q: "你比較常的「壞念頭」？", a: "希望某個人倒楣", b: "希望某個人消失" },
+  { cat: 'savage', q: "性格上比較像？", a: "嘴上很溫柔內心很冷", b: "嘴很毒內心其實很軟" },
+  { cat: 'savage', q: "你的友情比較像？", a: "很多朋友但不深", b: "很少朋友但很深" },
+  { cat: 'savage', q: "面對討厭的人比較會？", a: "直接斷聯", b: "表面笑笑暗中罵" },
+  { cat: 'savage', q: "日常你比較常？", a: "說別人壞話", b: "聽別人說別人壞話然後加碼" },
+  { cat: 'savage', q: "動力來源你比較像？", a: "需要被誇獎才有動力", b: "需要被批評才會努力" },
+  { cat: 'savage', q: "你的「壞脾氣」？", a: "對最親的人最兇", b: "對外人爆但對家人很乖" },
+  { cat: 'savage', q: "職場/家裡比較常的內心話？", a: "好煩怎麼又是我做", b: "他憑什麼又不做" },
+  { cat: 'savage', q: "在團體裡你是？", a: "搞氣氛的", b: "搞破壞的（不自覺）" },
+  { cat: 'savage', q: "面對別人成功，你比較像？", a: "看到別人成功會酸幾句", b: "看到別人成功會默默封鎖" },
+  { cat: 'savage', q: "你比較容易？", a: "把朋友變成敵人", b: "把陌生人變成朋友" },
+  { cat: 'savage', q: "你的最大缺點？", a: "懶", b: "自私" },
+  { cat: 'savage', q: "在感情/友情中你比較像？", a: "嫉妒型", b: "受害者型" },
+  { cat: 'savage', q: "壓力大時你會？", a: "傷害最愛的人", b: "傷害自己" },
+  { cat: 'savage', q: "比較常的內心 OS？", a: "我才是對的", b: "算了懶得跟你吵" },
+  // dilemma (25)
+  { cat: 'dilemma', q: "同事的便當很臭，你會？", a: "直接說", b: "暗中離他遠一點" },
+  { cat: 'dilemma', q: "朋友送你超醜的禮物，你會？", a: "放著生灰塵", b: "默默轉送別人" },
+  { cat: 'dilemma', q: "撿到一張中獎發票（200元），你會？", a: "拿去兌換", b: "丟回去/報失" },
+  { cat: 'dilemma', q: "電影院旁邊一直講話，你會？", a: "當場叫他閉嘴", b: "默默生氣" },
+  { cat: 'dilemma', q: "朋友請你幫他圓謊，你會？", a: "好啦幫他", b: "拒絕" },
+  { cat: 'dilemma', q: "你發現好朋友的伴侶劈腿，你會？", a: "馬上告訴朋友", b: "假裝沒看到" },
+  { cat: 'dilemma', q: "在咖啡店看到陌生人手機沒拿走，你會？", a: "追出去還他", b: "交給店員就好" },
+  { cat: 'dilemma', q: "前任傳訊息問你最近好嗎，你會？", a: "回他", b: "已讀不回" },
+  { cat: 'dilemma', q: "撿到 500 元現金，你會？", a: "自己留著", b: "拿去交給警察" },
+  { cat: 'dilemma', q: "朋友拜託你借錢給他，你會？", a: "借", b: "找藉口拒絕" },
+  { cat: 'dilemma', q: "在路上看到吵架的情侶，你會？", a: "上前關心", b: "快步走開" },
+  { cat: 'dilemma', q: "好朋友的伴侶向你曖昧，你會？", a: "告訴朋友", b: "自己擋掉就好" },
+  { cat: 'dilemma', q: "你看到同事偷拿公司的東西，你會?", a: "告發", b: "當沒看到" },
+  { cat: 'dilemma', q: "排隊有人插隊，你會？", a: "出聲指責", b: "默默忍" },
+  { cat: 'dilemma', q: "收到不喜歡的禮物，當面要？", a: "假裝很喜歡", b: "說「謝謝但其實這不太合我」" },
+  { cat: 'dilemma', q: "朋友新對象你看了就不喜歡，你會？", a: "提醒朋友", b: "讓朋友自己看" },
+  { cat: 'dilemma', q: "在群組看到自己被誤會，你會？", a: "馬上解釋", b: "退群算了" },
+  { cat: 'dilemma', q: "你發現家人偷看你日記/手機，你會？", a: "正面衝突", b: "從此不再寫真實想法" },
+  { cat: 'dilemma', q: "朋友超晚才回你訊息卻立刻發限動，你會？", a: "酸他一下", b: "假裝沒看到" },
+  { cat: 'dilemma', q: "你被前任的新對象搭話，你會？", a: "好好聊", b: "禮貌但保持距離" },
+  { cat: 'dilemma', q: "在團體出遊有人偷懶不分攤費用，你會？", a: "當場點破", b: "事後不再揪他" },
+  { cat: 'dilemma', q: "你發現主管對某個同事特別好，你會？", a: "私下抱怨", b: "想辦法變成那個同事" },
+  { cat: 'dilemma', q: "朋友求婚你被選伴郎/伴娘但你不想做，你會？", a: "硬著頭皮答應", b: "誠實拒絕" },
+  { cat: 'dilemma', q: "看到別人家小孩在公共場合大哭，你會？", a: "覺得家長該管", b: "覺得小孩本來就會這樣" },
+  { cat: 'dilemma', q: "朋友新工作其實很雷，他問你意見時，你會？", a: "誠實說", b: "說「自己想清楚就好」" },
+  // party (20)
+  { cat: 'party', q: "喝醉後比較常？", a: "傳訊息給不該傳的人", b: "在路上唱歌" },
+  { cat: 'party', q: "隔天宿醉你會？", a: "照常上班", b: "請假躺整天" },
+  { cat: 'party', q: "比較喜歡的酒？", a: "調酒/Highball", b: "啤酒" },
+  { cat: 'party', q: "聚會比較想當？", a: "第一個到場的", b: "最後一個到的" },
+  { cat: 'party', q: "KTV 你是？", a: "搶麥不放的", b: "點歌給別人唱的" },
+  { cat: 'party', q: "朋友揪去夜衝，你會？", a: "好啊衝", b: "明天還要上班拒絕" },
+  { cat: 'party', q: "比較常的喝醉行為？", a: "話超多", b: "突然安靜" },
+  { cat: 'party', q: "派對中你是？", a: "永遠在跳舞的", b: "永遠在桌邊聊天的" },
+  { cat: 'party', q: "出去玩你是？", a: "排行程的人", b: "跟著走的人" },
+  { cat: 'party', q: "去酒吧你會？", a: "點調酒問酒保推薦", b: "永遠點一樣的" },
+  { cat: 'party', q: "聚會散場後你會？", a: "意猶未盡想續攤", b: "想趕快回家充電" },
+  { cat: 'party', q: "看到 DJ 在放歌你會？", a: "湊上前跳", b: "找角落坐下" },
+  { cat: 'party', q: "派對主題如果是化妝舞會？", a: "全力打扮", b: "穿正常衣服去" },
+  { cat: 'party', q: "派對遊戲被叫到名字？", a: "興奮接招", b: "希望大家忘了我" },
+  { cat: 'party', q: "比較像哪種喝法？", a: "慢慢小酌一整晚", b: "前面拼很快、後面斷片" },
+  { cat: 'party', q: "派對吃什麼？", a: "鹹酥雞", b: "披薩" },
+  { cat: 'party', q: "派對結束後你最常？", a: "肚子餓想吃宵夜", b: "倒頭就睡" },
+  { cat: 'party', q: "團聚拍照你會？", a: "搶 C 位", b: "躲到旁邊" },
+  { cat: 'party', q: "聚會中喜歡？", a: "認識新朋友", b: "跟認識的人聊更深" },
+  { cat: 'party', q: "派對結束後你會？", a: "發限動", b: "什麼都不發" }
+];
+
+const CATEGORIES = {
+  truth:   { name: '真心話', color: '#e57399', bg: '#4a2b3a' },
+  wyr:     { name: '二選一', color: '#9d7bc4', bg: '#3a2e4f' },
+  savage:  { name: '殘酷',   color: '#e25555', bg: '#4a2828' },
+  dilemma: { name: '兩難',   color: '#7ba0c7', bg: '#2a3a4a' },
+  party:   { name: '派對',   color: '#f0c850', bg: '#4a3e1f' }
+};
+
+// 預設 emoji 庫
+const PRESET_EMOJIS = [
+  '🍑', '🍓', '🍋', '🍒', '🍇', '🍉',
+  '🌿', '🌸', '🌷', '🌻', '🌙', '⭐',
+  '🐱', '🐶', '🦊', '🐻', '🐰', '🐼',
+  '🐨', '🐹', '🐸', '🐧', '🦄', '🐝',
+  '☕', '🧋', '🍵', '🍪', '🍩', '🍰'
+];
+
+// ============ 全域狀態 ============
+let state = null;          // 房間 state
+let roomCode = null;       // 房間代碼
+let myPlayerId = null;     // 我的玩家 ID
+let unsub = null;          // onSnapshot unsubscriber
+let countdownInterval = null;
+let myRoundStartedQ = null;
+let myRoundStartTime = null;
+let pendingAnswer = null;
+let pendingGuesses = {};  // { otherPlayerId: 'a'|'b' }
+// ROUND_TIME 改為動態：依玩家人數
+function getRoundTime() {
+  const playerCount = state && state.players ? state.players.length : 2;
+  return playerCount * 10;  // 2人=20s, 3人=30s, 4人=40s, 5人=50s
+}
+
+// ============ Utility ============
+function el(tag, attrs = {}, ...children) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'class') e.className = v;
+    else if (k === 'style') e.setAttribute('style', v);
+    else if (k.startsWith('on')) e[k] = v;
+    else e.setAttribute(k, v);
+  }
+  for (const c of children) {
+    if (c == null) continue;
+    e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+  }
+  return e;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, m => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[m]);
+}
+
+function makeId(prefix) {
+  return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,7)}`;
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ============ Local Storage ============
+function saveMe(player) {
+  if (!roomCode) return;
+  localStorage.setItem(`party:${roomCode}:player`, JSON.stringify(player));
+}
+
+function loadMe() {
+  if (!roomCode) return null;
+  const raw = localStorage.getItem(`party:${roomCode}:player`);
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
+function saveRoomCode(code) {
+  localStorage.setItem('party:lastRoom', code);
+}
+
+function loadLastRoom() {
+  return localStorage.getItem('party:lastRoom') || '';
+}
+
+// ============ Firestore ============
+async function loadRoom() {
+  const ref = doc(db, 'partyRooms', roomCode);
+  const snap = await getDoc(ref);
+  return snap.exists() ? snap.data() : null;
+}
+
+async function saveRoom() {
+  if (!roomCode || !state) return;
+  const ref = doc(db, 'partyRooms', roomCode);
+  await setDoc(ref, state);
+}
+
+function subscribeRoom() {
+  if (unsub) unsub();
+  const ref = doc(db, 'partyRooms', roomCode);
+  unsub = onSnapshot(ref, async (snap) => {
+    if (!snap.exists()) return;
+    const fresh = snap.data();
+
+    // 自動揭曉檢查：所有在線玩家都答完了、但還沒揭曉（只對 mochi 模式）
+    if (fresh.gameType !== 'dice' && fresh.currentRound && !fresh.currentRound.revealed && fresh.status === 'playing') {
+      const onlinePlayers = (fresh.players || []).filter(p => p.online);
+      const answers = fresh.currentRound.answers || {};
+      const allAnswered = onlinePlayers.length > 0 &&
+                          onlinePlayers.every(p => answers[p.id]);
+      if (allAnswered) {
+        const firstId = onlinePlayers
+          .map(p => p.id).sort()[0];
+        if (firstId === myPlayerId) {
+          state = fresh;
+          doReveal();
+          await saveRoom();
+          return;
+        }
+      }
+    }
+
+    // Dice fallback: 如果擲骰狀態超過 4 秒沒結束（主玩家可能離開），由其他在線玩家觸發
+    if (fresh.gameType === 'dice' && fresh.diceState && fresh.diceState.rolling) {
+      const stuck = Date.now() - (fresh.diceState.rollTimestamp || 0) > 4000;
+      if (stuck) {
+        const onlineIds = (fresh.players || []).filter(p => p.online).map(p => p.id).sort();
+        if (onlineIds[0] === myPlayerId) {
+          state = fresh;
+          // 由我代為結束動畫
+          setTimeout(() => finishRollAnimation(), 100);
+        }
+      }
+    }
+
+    state = fresh;
+    render();
+  }, (error) => {
+    // 顯示連線錯誤
+    console.error('Firestore subscribe error:', error);
+    const app = document.getElementById('app');
+    app.innerHTML = '';
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.cssText = 'padding:24px;text-align:center;background:var(--soft-pink);';
+    card.innerHTML = `
+      <div style="font-size:32px;margin-bottom:8px;">⚠️</div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:10px;">連線到房間失敗</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:14px;">${escapeHtml(error.message || '未知錯誤')}</div>
+      <div style="font-size:12px;color:var(--ink);line-height:1.6;text-align:left;background:var(--card);padding:12px;border-radius:8px;">
+        <b>可能原因：</b><br>
+        1. Firebase Firestore Rules 還沒開放 partyRooms<br>
+        2. 網路問題<br><br>
+        <b>解法：</b><br>
+        到 Firebase Console → Firestore → Rules，加上 partyRooms 規則：<br>
+        <code style="background:var(--bg);padding:6px;display:block;margin-top:6px;border-radius:6px;font-size:11px;">match /partyRooms/{roomId} {<br>&nbsp;&nbsp;allow read, write: if true;<br>}</code>
+      </div>
+      <button class="btn btn-ghost" style="margin-top:14px;" onclick="location.reload()">重新整理</button>
+    `;
+    app.appendChild(card);
+  });
+}
+
+// ============ Helpers ============
+function getMe() {
+  if (!state || !state.players || !myPlayerId) return null;
+  return state.players.find(p => p.id === myPlayerId);
+}
+
+function getPlayer(playerId) {
+  if (!state || !state.players) return null;
+  return state.players.find(p => p.id === playerId);
+}
+
+function customConfirm(message, opts = {}) {
+  return new Promise((resolve) => {
+    const old = document.getElementById('confirm-modal');
+    if (old) old.remove();
+    const overlay = el('div', {
+      id: 'confirm-modal',
+      class: 'modal-overlay'
+    });
+    const modal = el('div', { class: 'modal' });
+    modal.appendChild(el('div', { style: 'font-size:15px;line-height:1.6;margin-bottom:18px;white-space:pre-wrap;' }, message));
+    const row = el('div', { style: 'display:flex;gap:8px;' });
+    const cancel = el('button', {
+      class: 'btn btn-ghost',
+      style: 'flex:1;',
+      onclick: () => { overlay.remove(); resolve(false); }
+    }, opts.cancelText || '取消');
+    const ok = el('button', {
+      class: opts.danger ? 'btn btn-danger' : 'btn',
+      style: 'flex:1;',
+      onclick: () => { overlay.remove(); resolve(true); }
+    }, opts.okText || '確定');
+    row.appendChild(cancel);
+    row.appendChild(ok);
+    modal.appendChild(row);
+    overlay.appendChild(modal);
+    overlay.onclick = (e) => { if (e.target === overlay) { overlay.remove(); resolve(false); } };
+    document.body.appendChild(overlay);
+  });
+}
+
+// ============ Render: Main Router ============
+function render() {
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+
+  if (!roomCode) {
+    app.appendChild(renderRoomEntry());
+    return;
+  }
+
+  if (!state) {
+    app.appendChild(el('div', { class: 'card center' }, '連線中…'));
+    return;
+  }
+
+  if (!myPlayerId || !getMe()) {
+    app.appendChild(renderJoinForm());
+    return;
+  }
+
+  app.appendChild(renderHeader());
+
+  if (state.status === 'ended') {
+    app.appendChild(renderEnded());
+  } else if (state.status === 'waiting') {
+    // 等待中：依 gameType 顯示對應 lobby、如果沒選遊戲就顯示主選單
+    if (!state.gameType) {
+      app.appendChild(renderGameSelect());
+    } else {
+      app.appendChild(renderWaiting());
+    }
+  } else if (state.status === 'playing') {
+    if (state.gameType === 'dice') {
+      app.appendChild(renderDicePlaying());
+    } else {
+      app.appendChild(renderPlaying());  // 預設 mochi
+    }
+  }
+}
+
+// ============ Render: Game Select ============
+function renderGameSelect() {
+  const wrap = el('div');
+
+  // 已加入的玩家列表
+  if (state.players && state.players.length > 0) {
+    const list = el('div', { class: 'card' });
+    list.appendChild(el('div', { class: 'label' }, `玩家（${state.players.length}）`));
+    state.players.forEach(p => {
+      const row = el('div', { style: 'display:flex;align-items:center;gap:10px;padding:8px 0;font-size:13px;' });
+      row.appendChild(el('span', { style: 'font-size:20px;' }, p.emoji));
+      row.appendChild(el('div', { style: 'flex:1;font-weight:600;' }, p.name + (p.id === myPlayerId ? ' (你)' : '')));
+      row.appendChild(el('span', { class: 'player-dot' + (p.online ? '' : ' offline') }));
+      list.appendChild(row);
+    });
+    wrap.appendChild(list);
+  }
+
+  // 房間代碼
+  wrap.appendChild(el('div', {
+    class: 'card',
+    style: 'text-align:center;background:var(--soft-orange);'
+  },
+    el('div', { style: 'font-size:11px;color:var(--muted);letter-spacing:1px;margin-bottom:4px;' }, '分享房間代碼'),
+    el('div', { style: 'font-size:20px;font-weight:700;letter-spacing:3px;color:var(--accent);' }, roomCode.toUpperCase())
+  ));
+
+  // 遊戲選單
+  const menu = el('div', { class: 'card' });
+  menu.appendChild(el('div', { class: 'label' }, '選擇遊戲'));
+
+  const mochiCard = el('div', {
+    style: 'border:1.5px solid var(--line);border-radius:14px;padding:16px;margin-bottom:10px;cursor:pointer;background:white;',
+    onclick: async () => {
+      if (state.players.length < 2) {
+        alert('至少要 2 人才能玩');
+        return;
+      }
+      await pickGame('mochi');
+    }
+  });
+  mochiCard.appendChild(el('div', { style: 'font-size:24px;margin-bottom:4px;' }, '💭'));
+  mochiCard.appendChild(el('div', { style: 'font-size:15px;font-weight:700;margin-bottom:2px;' }, '默契猜猜'));
+  mochiCard.appendChild(el('div', { style: 'font-size:12px;color:var(--muted);' }, '殘酷二選一、猜對方會選哪個、猜錯的喝'));
+  menu.appendChild(mochiCard);
+
+  const diceCard = el('div', {
+    style: 'border:1.5px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;background:white;',
+    onclick: async () => {
+      if (state.players.length < 2) {
+        alert('至少要 2 人才能玩');
+        return;
+      }
+      await pickGame('dice');
+    }
+  });
+  diceCard.appendChild(el('div', { style: 'font-size:24px;margin-bottom:4px;' }, '🎲'));
+  diceCard.appendChild(el('div', { style: 'font-size:15px;font-weight:700;margin-bottom:2px;' }, '骰運氣'));
+  diceCard.appendChild(el('div', { style: 'font-size:12px;color:var(--muted);' }, '骰到殺手數字就喝一口、5 輪結束看誰喝最多'));
+  menu.appendChild(diceCard);
+
+  wrap.appendChild(menu);
+
+  if (state.players.length < 2) {
+    wrap.appendChild(el('div', {
+      style: 'text-align:center;color:var(--muted);padding:10px;font-size:13px;'
+    }, '至少要 2 個人才能開始'));
+  }
+
+  return wrap;
+}
+
+async function pickGame(gameType) {
+  const fresh = await loadRoom();
+  if (!fresh) return;
+  state = fresh;
+  state.gameType = gameType;
+  await saveRoom();
+  render();
+}
+
+// ============ Render: Room Entry ============
+function renderRoomEntry() {
+  const wrap = el('div');
+
+  // Logo card
+  wrap.appendChild(el('div', {
+    class: 'card',
+    style: 'text-align:center;padding:36px 24px;background:linear-gradient(135deg, var(--card), var(--soft-purple));'
+  },
+    el('div', { style: 'font-size:36px;margin-bottom:8px;' }, '🍻'),
+    el('div', { style: 'font-size:22px;font-weight:700;margin-bottom:6px;letter-spacing:0.5px;' }, '默契猜猜'),
+    el('div', { style: 'font-size:13px;color:var(--muted);letter-spacing:1px;' }, '派對版 · 殘酷二選一')
+  ));
+
+  // Description
+  wrap.appendChild(el('div', {
+    class: 'card',
+    style: 'font-size:13px;line-height:1.7;color:var(--muted);'
+  },
+    el('div', { style: 'font-size:12px;color:var(--accent);font-weight:700;letter-spacing:1px;margin-bottom:6px;' }, '怎麼玩'),
+    el('div', {}, '2-5 人 · 一人一手機'),
+    el('div', {}, '每輪抽一題、系統指定你「猜誰」'),
+    el('div', {}, '猜錯的喝一口 🍻'),
+    el('div', {}, '猜對最多的人 = 最會看人')
+  ));
+
+  // Enter room form
+  const form = el('div', { class: 'card' });
+  form.appendChild(el('div', { class: 'label' }, '輸入房間代碼'));
+  const lastRoom = loadLastRoom();
+  const codeInput = el('input', {
+    class: 'input',
+    style: 'text-align:center;letter-spacing:4px;font-size:20px;font-weight:700;',
+    placeholder: '輸入或建立',
+    maxlength: '10',
+    value: lastRoom
+  });
+  form.appendChild(codeInput);
+
+  form.appendChild(el('div', {
+    style: 'font-size:11px;color:var(--muted);margin-top:8px;text-align:center;'
+  }, '把代碼告訴朋友、他們也輸入一樣就能加入'));
+
+  const enterBtn = el('button', {
+    class: 'btn',
+    style: 'margin-top:14px;',
+    onclick: async () => {
+      const code = codeInput.value.trim().toLowerCase();
+      if (!code) { alert('請輸入房間代碼'); return; }
+      if (code.length < 3) { alert('代碼至少 3 個字'); return; }
+      if (!/^[a-z0-9]+$/.test(code)) { alert('只能用英文字母和數字'); return; }
+      enterBtn.disabled = true;
+      enterBtn.textContent = '進入中...';
+      try {
+        await enterRoom(code);
+      } catch (e) {
+        alert('連線失敗：' + (e.message || '未知錯誤'));
+        enterBtn.disabled = false;
+        enterBtn.textContent = '進入房間';
+      }
+    }
+  }, '進入房間');
+  form.appendChild(enterBtn);
+
+  wrap.appendChild(form);
+
+  return wrap;
+}
+
+// ============ Render: Header ============
+function renderHeader() {
+  const h = el('div', { class: 'header' });
+
+  const left = el('div', { style: 'display:flex;flex-direction:column;gap:2px;' });
+  left.appendChild(el('div', { class: 'title' }, '默契猜猜'));
+  const sub = el('div', { class: 'header-sub' });
+  const playerCount = state.players ? state.players.filter(p => p.online).length : 0;
+  sub.innerHTML = `房間：<b>${escapeHtml(roomCode)}</b> · ${playerCount} 人在線`;
+  left.appendChild(sub);
+  h.appendChild(left);
+
+  const right = el('div', { class: 'header-right' });
+
+  const me = getMe();
+  if (me) {
+    const chip = el('div', { class: 'player-chip me', style: 'cursor:pointer;' },
+      el('span', { class: 'player-emoji' }, me.emoji),
+      el('span', {}, me.name)
+    );
+    chip.onclick = () => showProfileEdit();
+    right.appendChild(chip);
+  }
+
+  const menuBtn = el('button', { class: 'menu-btn', onclick: toggleMenu }, '⋯');
+  right.appendChild(menuBtn);
+
+  h.appendChild(right);
+  return h;
+}
+
+// ============ Render: Join Form (set name + emoji) ============
+function renderJoinForm() {
+  const wrap = el('div');
+
+  // 顯示已在房間的玩家
+  if (state.players && state.players.length > 0) {
+    const list = el('div', { class: 'card' });
+    list.appendChild(el('div', { class: 'label' }, `已加入（${state.players.length}）`));
+    const players = el('div', { style: 'display:flex;flex-wrap:wrap;gap:6px;' });
+    state.players.forEach(p => {
+      players.appendChild(el('div', { class: 'player-chip' + (p.online ? '' : ' offline') },
+        el('span', { class: 'player-emoji' }, p.emoji),
+        el('span', {}, p.name)
+      ));
+    });
+    list.appendChild(players);
+    wrap.appendChild(list);
+  }
+
+  // Form
+  const form = el('div', { class: 'card' });
+  form.appendChild(el('div', { class: 'label' }, '設定你的暱稱和頭像'));
+
+  let chosenEmoji = PRESET_EMOJIS[Math.floor(Math.random() * PRESET_EMOJIS.length)];
+
+  // 暱稱輸入
+  const nameInput = el('input', {
+    class: 'input',
+    placeholder: '取個名字（最多 10 字）',
+    maxlength: '10',
+    style: 'margin-bottom:16px;'
+  });
+  form.appendChild(nameInput);
+
+  // Emoji 選擇
+  form.appendChild(el('div', { style: 'font-size:11px;color:var(--muted);margin-bottom:8px;letter-spacing:0.5px;' }, '選一個頭像'));
+  const grid = el('div', { class: 'emoji-grid' });
+
+  function renderTiles() {
+    grid.innerHTML = '';
+    PRESET_EMOJIS.forEach(emoji => {
+      const tile = el('div', {
+        class: 'emoji-tile' + (emoji === chosenEmoji ? ' selected' : ''),
+        onclick: () => {
+          chosenEmoji = emoji;
+          customInput.value = '';
+          renderTiles();
+        }
+      }, emoji);
+      grid.appendChild(tile);
+    });
+  }
+  renderTiles();
+  form.appendChild(grid);
+
+  const customInput = el('input', {
+    class: 'input',
+    style: 'margin-top:10px;text-align:center;font-size:22px;',
+    placeholder: '或自訂 emoji',
+    maxlength: '20',
+    oninput: function() {
+      const v = this.value.trim();
+      if (v) {
+        chosenEmoji = v;
+        renderTiles();
+      }
+    }
+  });
+  form.appendChild(customInput);
+
+  const joinBtn = el('button', {
+    class: 'btn',
+    style: 'margin-top:16px;',
+    onclick: async () => {
+      const name = nameInput.value.trim();
+      if (!name) { alert('要先取個名字喔'); return; }
+      if (state.status !== 'waiting') {
+        alert('遊戲已開始，等這場結束再加入吧');
+        return;
+      }
+      if (state.players && state.players.length >= 5) {
+        alert('房間已滿（最多 5 人）');
+        return;
+      }
+      joinBtn.disabled = true;
+      joinBtn.textContent = '加入中...';
+      try {
+        await joinAsPlayer(name, chosenEmoji);
+      } catch (e) {
+        alert('加入失敗：' + (e.message || '未知錯誤'));
+        joinBtn.disabled = false;
+        joinBtn.textContent = '加入房間';
+      }
+    }
+  }, '加入房間');
+  form.appendChild(joinBtn);
+
+  // 離開房間
+  const leaveBtn = el('button', {
+    class: 'btn btn-ghost',
+    style: 'margin-top:8px;',
+    onclick: () => leaveRoom()
+  }, '離開');
+  form.appendChild(leaveBtn);
+
+  wrap.appendChild(form);
+  return wrap;
+}
+
+// ============ Render: Waiting (lobby) ============
+function renderWaiting() {
+  const wrap = el('div');
+
+  // 顯示已選遊戲
+  const gameInfo = state.gameType === 'dice'
+    ? { icon: '🎲', name: '骰運氣', desc: '骰到殺手數字就喝一口' }
+    : { icon: '💭', name: '默契猜猜', desc: '猜對方會選哪個' };
+  const gameCard = el('div', {
+    class: 'card',
+    style: 'background:var(--soft-orange);display:flex;align-items:center;gap:12px;'
+  });
+  gameCard.appendChild(el('span', { style: 'font-size:28px;' }, gameInfo.icon));
+  const gInfo = el('div', { style: 'flex:1;' });
+  gInfo.appendChild(el('div', { style: 'font-size:14px;font-weight:700;' }, gameInfo.name));
+  gInfo.appendChild(el('div', { style: 'font-size:11px;color:var(--muted);margin-top:2px;' }, gameInfo.desc));
+  gameCard.appendChild(gInfo);
+  const changeBtn = el('button', {
+    class: 'btn-ghost',
+    style: 'padding:6px 12px;font-size:12px;border-radius:8px;background:white;border:1px solid var(--line);color:var(--ink);cursor:pointer;font-family:inherit;',
+    onclick: async () => {
+      const fresh = await loadRoom();
+      if (!fresh) return;
+      state = fresh;
+      delete state.gameType;
+      state.currentRound = null;
+      state.diceState = null;
+      state.usedIndices = [];
+      state.history = [];
+      state.players.forEach(p => { p.score = 0; p.streak = 0; p.drinks = 0; });
+      await saveRoom();
+      render();
+    }
+  }, '換遊戲');
+  gameCard.appendChild(changeBtn);
+  wrap.appendChild(gameCard);
+
+  const card = el('div', { class: 'card' });
+  card.appendChild(el('div', { class: 'label' }, `玩家（${state.players.length} / 5）`));
+
+  state.players.forEach(p => {
+    const isMe = p.id === myPlayerId;
+    const row = el('div', {
+      style: 'display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);'
+    });
+    row.appendChild(el('span', { style: 'font-size:24px;' }, p.emoji));
+    row.appendChild(el('div', { style: 'flex:1;font-weight:600;' }, p.name + (isMe ? ' (你)' : '')));
+    row.appendChild(el('span', {
+      class: 'player-dot ' + (p.online ? '' : 'offline')
+    }));
+    row.appendChild(el('span', {
+      style: 'font-size:11px;color:var(--muted);width:36px;'
+    }, p.online ? '在線' : '離線'));
+    card.appendChild(row);
+  });
+  if (card.lastChild) card.lastChild.style.borderBottom = 'none';
+
+  wrap.appendChild(card);
+
+  // 分享提示
+  const tip = el('div', { class: 'card', style: 'text-align:center;background:var(--soft-purple);' });
+  tip.appendChild(el('div', { style: 'font-size:11px;color:var(--muted);letter-spacing:1px;margin-bottom:4px;' }, '分享給朋友'));
+  tip.appendChild(el('div', { style: 'font-size:18px;font-weight:700;letter-spacing:3px;color:var(--accent);' }, roomCode.toUpperCase()));
+  tip.appendChild(el('div', { style: 'font-size:11px;color:var(--muted);margin-top:6px;' }, '叫朋友輸入這個代碼就能進來'));
+  wrap.appendChild(tip);
+
+  // 開始按鈕
+  if (state.players.length >= 2) {
+    const startBtn = el('button', {
+      class: 'btn',
+      onclick: async () => {
+        startBtn.disabled = true;
+        startBtn.textContent = '開始中...';
+        try { await startGame(); }
+        catch (e) {
+          alert('開始失敗：' + e.message);
+          startBtn.disabled = false;
+          startBtn.textContent = '開始遊戲';
+        }
+      }
+    }, '開始遊戲');
+    wrap.appendChild(startBtn);
+  } else {
+    wrap.appendChild(el('div', {
+      style: 'text-align:center;color:var(--muted);padding:14px;font-size:13px;'
+    }, '至少要 2 個人才能開始'));
+  }
+
+  return wrap;
+}
+
+// ============ Render: Playing ============
+function renderPlaying() {
+  const wrap = el('div');
+  const round = state.currentRound;
+  if (!round) {
+    wrap.appendChild(el('div', { class: 'card center' }, '抽題中…'));
+    return wrap;
+  }
+
+  const me = getMe();
+  const myAnswer = round.answers && round.answers[myPlayerId];
+
+  // 揭曉狀態
+  if (round.revealed) {
+    stopCountdown();
+    myRoundStartedQ = null;
+    wrap.appendChild(renderReveal(round));
+    return wrap;
+  }
+
+  // 我已答完，等其他人
+  if (myAnswer) {
+    stopCountdown();
+    return renderWaitingForOthers(round);
+  }
+
+  // 還沒答 → 答題介面
+  wrap.appendChild(renderAnswerForm(round));
+  return wrap;
+}
+
+// ============ Render: Answer Form ============
+function renderAnswerForm(round) {
+  const wrap = el('div');
+
+  // 取得所有「其他玩家」（不含自己），按 id 排序保持一致順序
+  const otherPlayers = state.players.filter(p => p.id !== myPlayerId);
+
+  // 換新題清掉暫存
+  if (myRoundStartedQ !== round.questionIdx) {
+    pendingAnswer = null;
+    pendingGuesses = {};
+    myRoundStartTime = null;
+  }
+
+  // Timer
+  const timerWrap = el('div', { class: 'timer-wrap' });
+  const timerLabel = el('div', { class: 'timer-label' });
+  const timerText = el('span', {}, '⏱️ 剩餘時間');
+  const timerCount = el('span', { style: 'font-weight:700;color:var(--ink);' }, `${getRoundTime()}s`);
+  timerLabel.appendChild(timerText);
+  timerLabel.appendChild(timerCount);
+  timerWrap.appendChild(timerLabel);
+  const timerBar = el('div', { class: 'timer-bar' });
+  const timerFill = el('div', { class: 'timer-fill', style: 'width:100%;background:var(--green);' });
+  timerBar.appendChild(timerFill);
+  timerWrap.appendChild(timerLabel);
+  timerWrap.appendChild(timerBar);
+  wrap.appendChild(timerWrap);
+
+  // 題目卡
+  const qCard = el('div', { class: 'card' });
+  const catInfo = CATEGORIES[round.question.cat] || CATEGORIES.dilemma;
+  const topRow = el('div', { style: 'display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;' });
+  topRow.appendChild(el('span', {
+    class: 'cat-tag',
+    style: `background:${catInfo.bg};color:${catInfo.color};`
+  }, catInfo.name));
+  topRow.appendChild(el('span', { style: 'font-size:11px;color:var(--muted);' }, `第 ${round.roundNum} 題`));
+  qCard.appendChild(topRow);
+  qCard.appendChild(el('div', { class: 'question' }, round.question.q));
+  wrap.appendChild(qCard);
+
+  // 進度說明
+  wrap.appendChild(el('div', {
+    style: 'font-size:12px;color:var(--muted);text-align:center;margin-bottom:10px;'
+  }, `要答 1 題自己 + 猜 ${otherPlayers.length} 位玩家`));
+
+  // Step 1: 自己會選
+  const step1 = el('div', { class: 'card' });
+  step1.appendChild(el('div', { class: 'label' }, '1. 你自己會選？'));
+  const opts1 = el('div', { class: 'options' });
+  ['a', 'b'].forEach(key => {
+    const btn = el('button', {
+      class: 'option' + (pendingAnswer === key ? ' selected' : ''),
+      onclick: () => {
+        pendingAnswer = key;
+        opts1.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+        btn.classList.add('selected');
+        updateSubmit();
+      }
+    }, round.question[key]);
+    opts1.appendChild(btn);
+  });
+  step1.appendChild(opts1);
+  wrap.appendChild(step1);
+
+  // Step 2+: 對每位其他玩家猜
+  otherPlayers.forEach((other, idx) => {
+    const step = el('div', { class: 'card' });
+    step.appendChild(el('div', { class: 'label' },
+      `${idx + 2}. 猜 ${other.emoji} ${other.name} 會選？`));
+    const opts = el('div', { class: 'options' });
+    ['a', 'b'].forEach(key => {
+      const btn = el('button', {
+        class: 'option' + (pendingGuesses[other.id] === key ? ' selected' : ''),
+        onclick: () => {
+          pendingGuesses[other.id] = key;
+          opts.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+          btn.classList.add('selected');
+          updateSubmit();
+        }
+      }, round.question[key]);
+      opts.appendChild(btn);
+    });
+    step.appendChild(opts);
+    wrap.appendChild(step);
+  });
+
+  const submitBtn = el('button', {
+    class: 'btn',
+    onclick: () => {
+      if (!isAllFilled()) return;
+      stopCountdown();
+      const a = pendingAnswer;
+      const g = { ...pendingGuesses };
+      pendingAnswer = null;
+      pendingGuesses = {};
+      submitMyAnswer(a, g);
+    }
+  }, '送出');
+  if (!isAllFilled()) {
+    submitBtn.setAttribute('disabled', 'true');
+  }
+  wrap.appendChild(submitBtn);
+
+  function isAllFilled() {
+    if (!pendingAnswer) return false;
+    return otherPlayers.every(p => pendingGuesses[p.id]);
+  }
+  function updateSubmit() {
+    if (isAllFilled()) submitBtn.removeAttribute('disabled');
+    else submitBtn.setAttribute('disabled', 'true');
+  }
+
+  // 啟動倒數
+  if (myRoundStartedQ !== round.questionIdx) {
+    myRoundStartedQ = round.questionIdx;
+    myRoundStartTime = Date.now();
+  }
+  startCountdown(timerFill, timerCount);
+
+  return wrap;
+}
+
+function renderWaitingForOthers(round) {
+  const wrap = el('div');
+
+  const card = el('div', { class: 'card', style: 'text-align:center;padding:30px 20px;' });
+  card.appendChild(el('div', { style: 'font-size:32px;margin-bottom:10px;' }, '⌛'));
+  card.appendChild(el('div', { style: 'font-size:15px;font-weight:600;margin-bottom:8px;' }, '等其他人答題中…'));
+
+  // 顯示誰答了誰沒答
+  const list = el('div', { style: 'display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px;' });
+  state.players.forEach(p => {
+    const answered = round.answers && round.answers[p.id];
+    const chip = el('div', { class: 'player-chip' + (p.online ? '' : ' offline') });
+    chip.appendChild(el('span', { class: 'player-emoji' }, p.emoji));
+    chip.appendChild(el('span', {}, p.name));
+    chip.appendChild(el('span', {
+      class: 'player-dot ' + (answered ? 'answered' : ''),
+      style: answered ? '' : 'background:var(--muted);'
+    }));
+    list.appendChild(chip);
+  });
+  card.appendChild(list);
+
+  wrap.appendChild(card);
+  return wrap;
+}
+
+// ============ Render: Reveal ============
+function renderReveal(round) {
+  const wrap = el('div');
+
+  const myAnswer = round.answers[myPlayerId];
+  const otherPlayers = state.players.filter(p => p.id !== myPlayerId);
+
+  // 計算我這輪猜對幾個
+  let myCorrect = 0;
+  let myGuessable = 0;
+  if (myAnswer && !myAnswer.timeout) {
+    const myGuesses = myAnswer.guesses || {};
+    otherPlayers.forEach(other => {
+      const otherAns = round.answers[other.id];
+      if (!otherAns || otherAns.timeout || otherAns.answer == null) return;
+      myGuessable++;
+      if (myGuesses[other.id] === otherAns.answer) myCorrect++;
+    });
+  }
+  const myPerfect = myGuessable > 0 && myCorrect === myGuessable;
+
+  // Banner
+  if (myPerfect) {
+    wrap.appendChild(el('div', { class: 'banner banner-streak' },
+      `🎯 完美！全部猜對 (+${myCorrect + 2} 分)`));
+  } else if (myCorrect > 0) {
+    wrap.appendChild(el('div', { class: 'banner banner-correct' },
+      `✓ 猜對 ${myCorrect} / ${myGuessable} 個 (+${myCorrect} 分)`));
+  } else if (myAnswer) {
+    wrap.appendChild(el('div', { class: 'banner banner-drink' },
+      el('span', { class: 'drink-icon' }, '🍻'),
+      ` 一個都沒猜中、喝一口！`
+    ));
+  }
+
+  // 題目重現 + 每人選了什麼
+  const qCard = el('div', { class: 'card' });
+  const catInfo = CATEGORIES[round.question.cat] || CATEGORIES.dilemma;
+  qCard.appendChild(el('span', {
+    class: 'cat-tag',
+    style: `background:${catInfo.bg};color:${catInfo.color};margin-bottom:8px;display:inline-block;`
+  }, catInfo.name));
+  qCard.appendChild(el('div', { class: 'question', style: 'margin-bottom:14px;' }, round.question.q));
+  qCard.appendChild(el('div', { class: 'label' }, '每個人選了'));
+  state.players.forEach(p => {
+    const ans = round.answers[p.id];
+    const row = el('div', {
+      style: 'display:grid;grid-template-columns:auto 1fr;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;align-items:center;'
+    });
+    row.appendChild(el('div', { style: 'display:flex;align-items:center;gap:6px;font-weight:700;' },
+      el('span', { style: 'font-size:18px;' }, p.emoji),
+      el('span', {}, p.name + (p.id === myPlayerId ? ' (你)' : ''))
+    ));
+    if (ans && ans.answer != null) {
+      const chose = ans.answer === 'a' ? round.question.a : round.question.b;
+      const cell = el('div', {}, el('b', {}, chose));
+      if (ans.timeout) {
+        cell.appendChild(el('span', { style: 'color:var(--red);font-size:11px;margin-left:6px;' }, '⏱️ 超時'));
+      }
+      row.appendChild(cell);
+    } else {
+      row.appendChild(el('div', { style: 'color:var(--muted);' }, ans && ans.timeout ? '⏱️ 超時沒答' : '沒答到'));
+    }
+    qCard.appendChild(row);
+  });
+  if (qCard.lastChild) qCard.lastChild.style.borderBottom = 'none';
+  wrap.appendChild(qCard);
+
+  // 「我的猜測對照」
+  if (myAnswer) {
+    const myGuessCard = el('div', { class: 'card' });
+    myGuessCard.appendChild(el('div', { class: 'label' }, '你的猜測'));
+    const myGuesses = myAnswer.guesses || {};
+    otherPlayers.forEach(other => {
+      const otherAns = round.answers[other.id];
+      const myGuess = myGuesses[other.id];
+      const row = el('div', {
+        style: 'display:grid;grid-template-columns:auto 1fr auto;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;align-items:center;'
+      });
+      row.appendChild(el('div', { style: 'display:flex;align-items:center;gap:6px;font-weight:600;' },
+        el('span', { style: 'font-size:16px;' }, other.emoji),
+        el('span', {}, other.name)
+      ));
+      const detail = el('div', { style: 'font-size:12px;color:var(--muted);line-height:1.5;' });
+      if (myGuess && otherAns && !otherAns.timeout && otherAns.answer != null) {
+        const guessed = myGuess === 'a' ? round.question.a : round.question.b;
+        const actual = otherAns.answer === 'a' ? round.question.a : round.question.b;
+        detail.innerHTML = `猜 <b>${escapeHtml(guessed)}</b> · 實際 <b>${escapeHtml(actual)}</b>`;
+      } else if (!myGuess) {
+        detail.innerHTML = '<span style="color:var(--muted);">沒猜</span>';
+      } else {
+        detail.innerHTML = '<span style="color:var(--muted);">對方沒答</span>';
+      }
+      row.appendChild(detail);
+      const isCorrect = myGuess && otherAns && !otherAns.timeout
+        && otherAns.answer != null && myGuess === otherAns.answer;
+      const isWrong = myGuess && otherAns && !otherAns.timeout
+        && otherAns.answer != null && myGuess !== otherAns.answer;
+      if (isCorrect) {
+        row.appendChild(el('span', { style: 'color:var(--green);font-size:18px;font-weight:700;' }, '✓'));
+      } else if (isWrong) {
+        row.appendChild(el('span', { style: 'color:var(--red);font-size:18px;font-weight:700;' }, '✗'));
+      } else {
+        row.appendChild(el('span', { style: 'color:var(--muted);' }, '—'));
+      }
+      myGuessCard.appendChild(row);
+    });
+    if (myGuessCard.lastChild) myGuessCard.lastChild.style.borderBottom = 'none';
+    wrap.appendChild(myGuessCard);
+  }
+
+  // 即時排行
+  const ranked = [...state.players].sort((a, b) => (b.score || 0) - (a.score || 0));
+  const rankCard = el('div', { class: 'card' });
+  rankCard.appendChild(el('div', { class: 'label' }, '目前排名'));
+  ranked.forEach((p, i) => {
+    const row = el('div', { style: 'display:flex;justify-content:space-between;padding:6px 0;font-size:13px;' });
+    row.appendChild(el('div', {},
+      el('span', { style: 'color:var(--muted);margin-right:8px;' }, `${i + 1}.`),
+      el('span', { style: 'font-size:16px;margin-right:4px;' }, p.emoji),
+      el('span', {}, p.name + (p.id === myPlayerId ? ' (你)' : ''))
+    ));
+    const scoreSpan = el('span', { style: 'font-weight:700;color:var(--accent);' }, `${p.score || 0} 分`);
+    if (p.lastPerfect) {
+      scoreSpan.textContent = `🎯 ${p.score || 0} 分`;
+    }
+    row.appendChild(scoreSpan);
+    rankCard.appendChild(row);
+  });
+  wrap.appendChild(rankCard);
+
+  // 下一題按鈕
+  const nextBtn = el('button', {
+    class: 'btn',
+    onclick: async () => {
+      nextBtn.disabled = true;
+      nextBtn.textContent = '抽題中...';
+      try { await nextRound(); }
+      catch (e) {
+        alert('抽題失敗：' + e.message);
+        nextBtn.disabled = false;
+        nextBtn.textContent = '下一題';
+      }
+    }
+  }, '下一題');
+  wrap.appendChild(nextBtn);
+
+  // 結束按鈕
+  const endBtn = el('button', {
+    class: 'btn btn-ghost',
+    style: 'margin-top:8px;',
+    onclick: async () => {
+      if (await customConfirm('要結束這場遊戲嗎？', { okText: '結束', danger: true })) {
+        await endGame();
+      }
+    }
+  }, '結束遊戲');
+  wrap.appendChild(endBtn);
+
+  return wrap;
+}
+
+// ============ Render: Ended ============
+// ============ Render: Dice Game ============
+const DICE_ROTATIONS = {
+  1: 'rotateX(0deg) rotateY(0deg)',
+  6: 'rotateX(0deg) rotateY(180deg)',
+  3: 'rotateX(0deg) rotateY(-90deg)',
+  4: 'rotateX(0deg) rotateY(90deg)',
+  5: 'rotateX(-90deg) rotateY(0deg)',
+  2: 'rotateX(90deg) rotateY(0deg)'
+};
+
+function makeDicePips(n) {
+  const arr = [];
+  for (let i = 0; i < n; i++) {
+    arr.push(el('div', { class: 'dice-pip' }));
+  }
+  return arr;
+}
+
+function makeDiceFace(value, position) {
+  const face = el('div', { class: `dice-face ${position} dface-${value}` });
+  makeDicePips(value).forEach(p => face.appendChild(p));
+  return face;
+}
+
+function makeDiceEl(showValue, isKillerHit) {
+  const dice = el('div', { class: 'dice' + (isKillerHit ? ' killer-hit' : '') });
+  // 六面：用固定的對應（demo 一致）
+  dice.appendChild(makeDiceFace(1, 'front'));
+  dice.appendChild(makeDiceFace(6, 'back'));
+  dice.appendChild(makeDiceFace(3, 'right'));
+  dice.appendChild(makeDiceFace(4, 'left'));
+  dice.appendChild(makeDiceFace(5, 'top'));
+  dice.appendChild(makeDiceFace(2, 'bottom'));
+
+  // 直接轉到目標值（不動畫）
+  if (showValue && DICE_ROTATIONS[showValue]) {
+    dice.style.transform = DICE_ROTATIONS[showValue];
+  }
+  return dice;
+}
+
+let lastRollTimestamp = 0;  // 記憶上次處理過哪次擲骰，避免重複動畫
+
+function renderDicePlaying() {
+  const wrap = el('div');
+  const ds = state.diceState;
+  if (!ds) {
+    wrap.appendChild(el('div', { class: 'card center' }, '初始化遊戲中…'));
+    return wrap;
+  }
+
+  const turnPlayer = getCurrentTurnPlayer();
+  const isMyTurn = turnPlayer && turnPlayer.id === myPlayerId;
+
+  // Header info
+  const infoCard = el('div', { class: 'card', style: 'display:flex;justify-content:space-between;align-items:center;' });
+  infoCard.appendChild(el('div', {},
+    el('div', { style: 'font-size:11px;color:var(--muted);letter-spacing:1px;' }, '回合'),
+    el('div', { style: 'font-size:18px;font-weight:700;margin-top:2px;' }, `Round ${ds.roundNum} / 5`)
+  ));
+  infoCard.appendChild(el('div', { style: 'text-align:right;' },
+    el('div', { style: 'font-size:11px;color:var(--muted);letter-spacing:1px;' }, '骰子'),
+    el('div', { style: 'font-size:18px;font-weight:700;margin-top:2px;' }, `🎲 ${ds.diceCount} 顆`)
+  ));
+  wrap.appendChild(infoCard);
+
+  // Killer 數字
+  const killerCard = el('div', { class: 'killer-card' });
+  killerCard.appendChild(el('div', { style: 'font-size:11px;letter-spacing:1px;color:var(--muted);margin-bottom:4px;' }, '本輪殺手數字'));
+  killerCard.appendChild(el('div', { class: 'killer-num' }, `${ds.killer}`));
+  killerCard.appendChild(el('div', { style: 'font-size:11px;color:var(--muted);margin-top:4px;' }, '骰到就喝一口'));
+  wrap.appendChild(killerCard);
+
+  // 輪到誰
+  const turnCard = el('div', {
+    class: 'card',
+    style: 'text-align:center;background:' + (isMyTurn ? 'var(--soft-orange)' : 'var(--card)') + ';'
+  });
+  if (turnPlayer) {
+    turnCard.appendChild(el('div', { style: 'font-size:11px;color:var(--muted);letter-spacing:1px;margin-bottom:6px;' },
+      isMyTurn ? '輪到你' : '輪到'));
+    turnCard.appendChild(el('div', { style: 'font-size:18px;font-weight:700;' },
+      el('span', { style: 'font-size:24px;margin-right:6px;' }, turnPlayer.emoji),
+      turnPlayer.name + (isMyTurn ? ' (你)' : '')
+    ));
+    if (ds.turnDrinks > 0) {
+      turnCard.appendChild(el('div', { style: 'font-size:12px;color:var(--pink);margin-top:6px;font-weight:600;' },
+        `本輪已喝 ${ds.turnDrinks} 口 🍻`));
+    }
+  }
+  wrap.appendChild(turnCard);
+
+  // 骰子場景
+  const stage = el('div', { class: 'dice-stage', id: 'dice-stage' });
+  const showResults = ds.diceValues && !ds.rolling;
+  for (let i = 0; i < ds.diceCount; i++) {
+    if (showResults) {
+      const value = ds.diceValues[i];
+      const isHit = value === ds.killer;
+      stage.appendChild(makeDiceEl(value, isHit));
+    } else if (ds.rolling) {
+      // 滾動中：直接放空白骰子，後續用 JS 加 rolling class
+      const dice = makeDiceEl(1, false);
+      dice.classList.add('rolling');
+      dice.style.transform = '';
+      stage.appendChild(dice);
+    } else {
+      // 還沒擲：靜止
+      stage.appendChild(makeDiceEl(1, false));
+    }
+  }
+  wrap.appendChild(stage);
+
+  // 動畫播放：onSnapshot 收到 rolling=true + 新的 rollTimestamp → 在本機跑動畫
+  if (ds.rolling && ds.rollTimestamp > lastRollTimestamp) {
+    lastRollTimestamp = ds.rollTimestamp;
+    // 1.2 秒後本機自動停下（顯示結果）
+    setTimeout(() => {
+      const stageEl = document.getElementById('dice-stage');
+      if (!stageEl) return;
+      const diceEls = stageEl.querySelectorAll('.dice');
+      diceEls.forEach((d, i) => {
+        d.classList.remove('rolling');
+        const value = ds.diceValues && ds.diceValues[i];
+        if (value) {
+          const extra = (3 + Math.floor(Math.random() * 3)) * 360;
+          d.style.transform = `rotateX(${extra}deg) rotateY(${extra}deg) ${DICE_ROTATIONS[value]}`;
+          if (value === ds.killer) d.classList.add('killer-hit');
+        }
+      });
+    }, 1200);
+  }
+
+  // 結果與動作
+  if (ds.rolling) {
+    wrap.appendChild(el('div', { class: 'card center', style: 'color:var(--muted);' }, '骰子滾動中...'));
+  } else if (ds.waitingNext === 'continue') {
+    // 命中、要繼續擲
+    const banner = el('div', {
+      class: 'card center',
+      style: 'background:var(--soft-pink);color:var(--pink);font-weight:700;'
+    });
+    const hits = ds.diceValues.filter(v => v === ds.killer).length;
+    banner.innerHTML = `🍻 骰到 ${hits} 個 <b>${ds.killer}</b>，喝一口！`;
+    wrap.appendChild(banner);
+
+    if (isMyTurn) {
+      const continueBtn = el('button', {
+        class: 'btn',
+        onclick: async () => {
+          continueBtn.disabled = true;
+          try { await continueRoll(); }
+          catch (e) { continueBtn.disabled = false; }
+        }
+      }, '繼續擲');
+      wrap.appendChild(continueBtn);
+    } else {
+      wrap.appendChild(el('div', {
+        style: 'text-align:center;color:var(--muted);padding:10px;font-size:13px;'
+      }, `等 ${turnPlayer.emoji} ${turnPlayer.name} 繼續擲...`));
+    }
+  } else if (ds.waitingNext === 'next') {
+    // 沒命中、換下一位
+    const banner = el('div', {
+      class: 'card center',
+      style: 'background:var(--soft-green);color:var(--green);font-weight:700;'
+    });
+    banner.innerHTML = `✓ 沒骰到 <b>${ds.killer}</b>，安全過關`;
+    wrap.appendChild(banner);
+
+    const nextBtn = el('button', {
+      class: 'btn',
+      onclick: async () => {
+        nextBtn.disabled = true;
+        try { await advanceToNext(); }
+        catch (e) { nextBtn.disabled = false; }
+      }
+    }, '換下一位');
+    wrap.appendChild(nextBtn);
+  } else {
+    // 還沒擲、等當前玩家
+    if (isMyTurn) {
+      const rollBtn = el('button', {
+        class: 'btn',
+        onclick: async () => {
+          rollBtn.disabled = true;
+          try { await rollDice(); }
+          catch (e) { rollBtn.disabled = false; }
+        }
+      }, '擲骰子！');
+      wrap.appendChild(rollBtn);
+    } else {
+      wrap.appendChild(el('div', {
+        style: 'text-align:center;color:var(--muted);padding:14px;font-size:13px;'
+      }, `等 ${turnPlayer ? turnPlayer.emoji + ' ' + turnPlayer.name : '其他玩家'} 擲骰子...`));
+    }
+  }
+
+  // 玩家累計喝口數
+  const stats = el('div', { class: 'card' });
+  stats.appendChild(el('div', { class: 'label' }, '累計喝口'));
+  const sortedByDrinks = [...state.players].sort((a, b) => (b.drinks || 0) - (a.drinks || 0));
+  sortedByDrinks.forEach(p => {
+    const row = el('div', {
+      style: 'display:flex;justify-content:space-between;padding:6px 0;font-size:13px;'
+    });
+    row.appendChild(el('div', {},
+      el('span', { style: 'font-size:16px;margin-right:6px;' }, p.emoji),
+      el('span', {}, p.name + (p.id === myPlayerId ? ' (你)' : ''))
+    ));
+    row.appendChild(el('span', { style: 'font-weight:700;color:var(--accent);' }, `${p.drinks || 0} 口`));
+    stats.appendChild(row);
+  });
+  wrap.appendChild(stats);
+
+  // 結束按鈕
+  const endBtn = el('button', {
+    class: 'btn btn-ghost',
+    onclick: async () => {
+      if (await customConfirm('要結束這場遊戲嗎？', { okText: '結束', danger: true })) {
+        await endDiceGame();
+      }
+    }
+  }, '結束遊戲');
+  wrap.appendChild(endBtn);
+
+  return wrap;
+}
+
+function renderEnded() {
+  if (state.gameType === 'dice') {
+    return renderEndedDice();
+  }
+  return renderEndedMochi();
+}
+
+function renderEndedDice() {
+  const wrap = el('div');
+
+  const ranked = [...state.players].sort((a, b) => (b.drinks || 0) - (a.drinks || 0));
+  const drunkest = ranked[0];
+  const soberest = ranked[ranked.length - 1];
+
+  wrap.appendChild(el('div', {
+    class: 'card',
+    style: 'text-align:center;padding:28px 20px;background:linear-gradient(135deg, var(--soft-pink), var(--soft-orange));'
+  },
+    el('div', { style: 'font-size:32px;margin-bottom:6px;' }, '🍻'),
+    el('div', { style: 'font-size:12px;color:var(--muted);letter-spacing:1px;margin-bottom:6px;' }, '喝最多'),
+    el('div', { style: 'font-size:20px;font-weight:700;' },
+      el('span', { style: 'margin-right:6px;' }, drunkest.emoji),
+      drunkest.name
+    ),
+    el('div', { style: 'font-size:13px;color:var(--pink);margin-top:4px;font-weight:600;' },
+      `${drunkest.drinks || 0} 口`)
+  ));
+
+  if (soberest && soberest.id !== drunkest.id) {
+    wrap.appendChild(el('div', {
+      class: 'card',
+      style: 'text-align:center;padding:18px;background:var(--soft-green);'
+    },
+      el('div', { style: 'font-size:24px;margin-bottom:4px;' }, '🌱'),
+      el('div', { style: 'font-size:11px;color:var(--muted);letter-spacing:1px;margin-bottom:4px;' }, '最清醒'),
+      el('div', { style: 'font-size:16px;font-weight:700;' },
+        el('span', { style: 'margin-right:6px;' }, soberest.emoji),
+        soberest.name,
+        ' · ',
+        el('span', { style: 'color:var(--green);' }, `${soberest.drinks || 0} 口`)
+      )
+    ));
+  }
+
+  const rankCard = el('div', { class: 'card' });
+  rankCard.appendChild(el('div', { class: 'label' }, '喝口排行'));
+  ranked.forEach((p, i) => {
+    const row = el('div', { class: 'rank-row' });
+    const rankClass = i === 0 ? 'first' : i === 1 ? 'second' : i === 2 ? 'third' : '';
+    row.appendChild(el('div', { class: 'rank-num ' + rankClass }, i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`));
+    row.appendChild(el('div', {},
+      el('div', { style: 'font-weight:600;' },
+        el('span', { style: 'font-size:18px;margin-right:6px;' }, p.emoji),
+        p.name + (p.id === myPlayerId ? ' (你)' : '')
+      )
+    ));
+    row.appendChild(el('div', { class: 'rank-score' }, `${p.drinks || 0} 口`));
+    rankCard.appendChild(row);
+  });
+  wrap.appendChild(rankCard);
+
+  const restartBtn = el('button', {
+    class: 'btn',
+    onclick: async () => {
+      restartBtn.disabled = true;
+      restartBtn.textContent = '重置中...';
+      try { await restartGame(); }
+      catch (e) {
+        alert('重置失敗：' + e.message);
+        restartBtn.disabled = false;
+        restartBtn.textContent = '再玩一局';
+      }
+    }
+  }, '再玩一局');
+  wrap.appendChild(restartBtn);
+
+  const leaveBtn = el('button', {
+    class: 'btn btn-ghost',
+    style: 'margin-top:8px;',
+    onclick: () => leaveRoom()
+  }, '離開房間');
+  wrap.appendChild(leaveBtn);
+
+  return wrap;
+}
+
+function renderEndedMochi() {
+  const wrap = el('div');
+
+  // 排名 banner
+  const ranked = [...state.players].sort((a, b) => (b.score || 0) - (a.score || 0));
+  const winner = ranked[0];
+
+  wrap.appendChild(el('div', {
+    class: 'card',
+    style: 'text-align:center;padding:32px 20px;background:linear-gradient(135deg, var(--soft-purple), var(--soft-pink));'
+  },
+    el('div', { style: 'font-size:36px;margin-bottom:6px;' }, '🏆'),
+    el('div', { style: 'font-size:13px;color:var(--muted);letter-spacing:1px;margin-bottom:6px;' }, '最會看人'),
+    el('div', { style: 'font-size:22px;font-weight:700;' },
+      el('span', { style: 'margin-right:6px;' }, winner.emoji),
+      winner.name
+    ),
+    el('div', { style: 'font-size:14px;color:var(--accent);margin-top:4px;' },
+      `猜對 ${winner.score || 0} 次`)
+  ));
+
+  // 完整排名
+  const rankCard = el('div', { class: 'card' });
+  rankCard.appendChild(el('div', { class: 'label' }, '總排名'));
+  ranked.forEach((p, i) => {
+    const row = el('div', { class: 'rank-row' });
+    const rankClass = i === 0 ? 'first' : i === 1 ? 'second' : i === 2 ? 'third' : '';
+    row.appendChild(el('div', { class: 'rank-num ' + rankClass }, i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`));
+    row.appendChild(el('div', {},
+      el('div', { style: 'font-weight:600;' },
+        el('span', { style: 'font-size:18px;margin-right:6px;' }, p.emoji),
+        p.name + (p.id === myPlayerId ? ' (你)' : '')
+      )
+    ));
+    row.appendChild(el('div', { class: 'rank-score' }, `${p.score || 0}`));
+    rankCard.appendChild(row);
+  });
+  wrap.appendChild(rankCard);
+
+  // 共玩了幾題
+  if (state.history && state.history.length > 0) {
+    wrap.appendChild(el('div', {
+      class: 'card center',
+      style: 'font-size:13px;color:var(--muted);'
+    }, `總共玩了 ${state.history.length} 題`));
+  }
+
+  // 再玩一局
+  const restartBtn = el('button', {
+    class: 'btn',
+    onclick: async () => {
+      restartBtn.disabled = true;
+      restartBtn.textContent = '重置中...';
+      try { await restartGame(); }
+      catch (e) {
+        alert('重置失敗：' + e.message);
+        restartBtn.disabled = false;
+        restartBtn.textContent = '再玩一局';
+      }
+    }
+  }, '再玩一局');
+  wrap.appendChild(restartBtn);
+
+  // 離開
+  const leaveBtn = el('button', {
+    class: 'btn btn-ghost',
+    style: 'margin-top:8px;',
+    onclick: () => leaveRoom()
+  }, '離開房間');
+  wrap.appendChild(leaveBtn);
+
+  return wrap;
+}
+
+// ============ Menu ============
+function toggleMenu() {
+  const old = document.getElementById('floating-menu');
+  if (old) { old.remove(); return; }
+  const menu = el('div', {
+    id: 'floating-menu',
+    style: 'position:absolute;right:16px;top:60px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px;min-width:160px;z-index:100;box-shadow:0 6px 20px rgba(0,0,0,0.3);'
+  });
+
+  const item = (label, onclick, danger) => {
+    const e = el('button', {
+      style: `display:block;width:100%;text-align:left;background:none;border:none;color:${danger ? 'var(--red)' : 'var(--ink)'};padding:10px 14px;font-size:14px;cursor:pointer;border-radius:8px;font-family:inherit;`,
+      onclick: () => {
+        document.getElementById('floating-menu')?.remove();
+        onclick();
+      }
+    }, label);
+    e.onmouseenter = () => e.style.background = 'var(--card-light)';
+    e.onmouseleave = () => e.style.background = 'none';
+    return e;
+  };
+
+  if (getMe()) {
+    menu.appendChild(item('改名字 / 頭像', () => showProfileEdit()));
+  }
+  menu.appendChild(item('離開房間', () => leaveRoom(), true));
+
+  document.body.appendChild(menu);
+
+  setTimeout(() => {
+    const close = (e) => {
+      if (!menu.contains(e.target) && e.target.className !== 'menu-btn') {
+        menu.remove();
+        document.removeEventListener('click', close);
+      }
+    };
+    document.addEventListener('click', close);
+  }, 0);
+}
+
+// ============ Profile Edit Modal ============
+function showProfileEdit() {
+  const me = getMe();
+  if (!me) return;
+
+  const old = document.getElementById('profile-modal');
+  if (old) old.remove();
+
+  let chosenEmoji = me.emoji;
+
+  const overlay = el('div', { id: 'profile-modal', class: 'modal-overlay' });
+  const modal = el('div', { class: 'modal' });
+
+  modal.appendChild(el('div', { style: 'font-size:16px;font-weight:700;margin-bottom:14px;' }, '改名字 / 頭像'));
+
+  const nameInput = el('input', {
+    class: 'input',
+    style: 'margin-bottom:14px;',
+    placeholder: '暱稱',
+    maxlength: '10',
+    value: me.name
+  });
+  modal.appendChild(nameInput);
+
+  modal.appendChild(el('div', { style: 'font-size:11px;color:var(--muted);margin-bottom:8px;' }, '頭像'));
+
+  const grid = el('div', { class: 'emoji-grid' });
+  function renderTiles() {
+    grid.innerHTML = '';
+    PRESET_EMOJIS.forEach(emoji => {
+      const tile = el('div', {
+        class: 'emoji-tile' + (emoji === chosenEmoji ? ' selected' : ''),
+        onclick: () => {
+          chosenEmoji = emoji;
+          customInput.value = '';
+          renderTiles();
+        }
+      }, emoji);
+      grid.appendChild(tile);
+    });
+  }
+  renderTiles();
+  modal.appendChild(grid);
+
+  const customInput = el('input', {
+    class: 'input',
+    style: 'margin-top:10px;text-align:center;font-size:22px;',
+    placeholder: '或自訂',
+    maxlength: '20',
+    oninput: function() {
+      const v = this.value.trim();
+      if (v) { chosenEmoji = v; renderTiles(); }
+    }
+  });
+  modal.appendChild(customInput);
+
+  const btnRow = el('div', { style: 'display:flex;gap:8px;margin-top:16px;' });
+  const cancelBtn = el('button', {
+    class: 'btn btn-ghost', style: 'flex:1;',
+    onclick: () => overlay.remove()
+  }, '取消');
+  const saveBtn = el('button', {
+    class: 'btn', style: 'flex:1;',
+    onclick: async () => {
+      const name = nameInput.value.trim();
+      if (!name) { alert('名字不能空白'); return; }
+      saveBtn.disabled = true;
+      saveBtn.textContent = '儲存中...';
+      try {
+        const fresh = await loadRoom();
+        if (!fresh) { overlay.remove(); return; }
+        state = fresh;
+        const idx = state.players.findIndex(p => p.id === myPlayerId);
+        if (idx >= 0) {
+          state.players[idx].name = name;
+          state.players[idx].emoji = chosenEmoji;
+          saveMe(state.players[idx]);
+          await saveRoom();
+        }
+        overlay.remove();
+        render();
+      } catch (e) {
+        alert('儲存失敗：' + e.message);
+        saveBtn.disabled = false;
+        saveBtn.textContent = '儲存';
+      }
+    }
+  }, '儲存');
+  btnRow.appendChild(cancelBtn);
+  btnRow.appendChild(saveBtn);
+  modal.appendChild(btnRow);
+
+  overlay.appendChild(modal);
+  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+  document.body.appendChild(overlay);
+}
+
+// ============ Business Logic ============
+
+async function enterRoom(code) {
+  roomCode = code;
+  saveRoomCode(code);
+
+  // 嘗試載入既有房間
+  const existing = await loadRoom();
+
+  if (existing) {
+    state = existing;
+  } else {
+    // 新房間
+    state = {
+      roomCode: code,
+      createdAt: Date.now(),
+      status: 'waiting',
+      players: [],
+      currentRound: null,
+      usedIndices: [],
+      history: []
+    };
+    await saveRoom();
+  }
+
+  // 嘗試恢復我的身分
+  const saved = loadMe();
+  if (saved && state.players) {
+    const matched = state.players.find(p => p.id === saved.id);
+    if (matched) {
+      // 我之前在這個房間 → 自動回來、標記 online
+      // 再撈一次 fresh 避免覆蓋對方剛改的東西
+      const fresh2 = await loadRoom();
+      if (fresh2) {
+        state = fresh2;
+        const idx = state.players.findIndex(p => p.id === saved.id);
+        if (idx >= 0) {
+          myPlayerId = saved.id;
+          state.players[idx].online = true;
+          await saveRoom();
+        }
+      }
+    }
+  }
+
+  subscribeRoom();
+  render();
+}
+
+async function joinAsPlayer(name, emoji) {
+  // 重撈最新狀態
+  const fresh = await loadRoom();
+  if (!fresh) throw new Error('房間消失了');
+  state = fresh;
+
+  if (state.status !== 'waiting') throw new Error('遊戲已開始');
+  if (!state.players) state.players = [];
+  if (state.players.length >= 5) throw new Error('房間已滿');
+
+  const newPlayer = {
+    id: makeId('p'),
+    name: name.slice(0, 10),
+    emoji,
+    joinedAt: Date.now(),
+    online: true,
+    score: 0,
+    streak: 0
+  };
+  state.players.push(newPlayer);
+  myPlayerId = newPlayer.id;
+  saveMe(newPlayer);
+  await saveRoom();
+  render();
+}
+
+async function startGame() {
+  const fresh = await loadRoom();
+  if (!fresh) throw new Error('房間消失了');
+  state = fresh;
+  if (state.status === 'playing') {
+    render();
+    return;
+  }
+  if (!state.players || state.players.length < 2) throw new Error('至少 2 人');
+  if (!state.gameType) throw new Error('還沒選遊戲');
+
+  state.status = 'playing';
+
+  if (state.gameType === 'dice') {
+    // 骰子遊戲初始化
+    initDiceGame();
+  } else {
+    // 默契猜猜
+    state.usedIndices = state.usedIndices || [];
+    state.history = state.history || [];
+    state.players.forEach(p => { p.score = 0; p.streak = 0; });
+    pickAndSetNewRound(1);
+  }
+
+  await saveRoom();
+  render();
+}
+
+// ============ Dice Game Logic ============
+function initDiceGame() {
+  // 隨機 player 起始順序
+  const shuffledIds = shuffle(state.players.map(p => p.id));
+  // 每人喝口數歸零
+  state.players.forEach(p => {
+    p.drinks = 0;
+  });
+
+  state.diceState = {
+    roundNum: 1,                       // 第幾輪（1-5）
+    diceCount: 3,                      // 這輪骰子數量
+    killer: Math.floor(Math.random() * 6) + 1,  // 殺手數字
+    playerOrder: shuffledIds,          // 玩家順序
+    currentTurnIdx: 0,                 // 目前輪到第幾個 (index of playerOrder)
+    diceValues: null,                  // 最後一次擲出的點數陣列
+    rolling: false,                    // 是否擲骰子動畫中
+    rollerId: null,                    // 誰擲的（驗證用）
+    rollTimestamp: 0,                  // 擲骰時間戳（觸發動畫）
+    turnDrinks: 0,                     // 這位玩家本輪喝的口數（重置：換人時歸零）
+    gameOver: false
+  };
+}
+
+function getCurrentTurnPlayer() {
+  if (!state.diceState) return null;
+  const id = state.diceState.playerOrder[state.diceState.currentTurnIdx];
+  return getPlayer(id);
+}
+
+async function rollDice() {
+  // 只有當前 turn 玩家能擲、且不在 rolling 中
+  const fresh = await loadRoom();
+  if (!fresh || !fresh.diceState) return;
+  state = fresh;
+
+  const ds = state.diceState;
+  if (ds.gameOver) return;
+  if (ds.rolling) return;  // 已經在擲了
+  if (ds.playerOrder[ds.currentTurnIdx] !== myPlayerId) {
+    alert('還沒輪到你');
+    return;
+  }
+
+  // 隨機骰子
+  const values = [];
+  for (let i = 0; i < ds.diceCount; i++) {
+    values.push(Math.floor(Math.random() * 6) + 1);
+  }
+
+  ds.rolling = true;
+  ds.rollerId = myPlayerId;
+  ds.rollTimestamp = Date.now();
+  ds.diceValues = values;
+  await saveRoom();
+  render();
+
+  // 動畫播完後（1.7 秒）由本機處理結果
+  setTimeout(async () => {
+    await finishRollAnimation();
+  }, 1900);
+}
+
+async function finishRollAnimation() {
+  const fresh = await loadRoom();
+  if (!fresh || !fresh.diceState) return;
+  state = fresh;
+  const ds = state.diceState;
+  if (!ds.rolling) return;
+
+  // 計算殺手數字命中
+  const hitCount = ds.diceValues.filter(v => v === ds.killer).length;
+
+  ds.rolling = false;
+
+  if (hitCount > 0) {
+    // 命中 → 該玩家喝一口、turnDrinks +1、累計也 +1
+    const me = state.players.find(p => p.id === ds.playerOrder[ds.currentTurnIdx]);
+    if (me) {
+      me.drinks = (me.drinks || 0) + 1;
+    }
+    ds.turnDrinks = (ds.turnDrinks || 0) + 1;
+    // 等使用者按「繼續擲」（或自動進入下一次擲）→ 先暫停 render 顯示結果
+    ds.waitingNext = 'continue';  // 給 UI 用：要顯示「繼續擲」按鈕
+  } else {
+    // 沒命中 → 換下一位玩家
+    ds.waitingNext = 'next';  // 要顯示「換下一位」按鈕
+  }
+
+  await saveRoom();
+  render();
+}
+
+async function continueRoll() {
+  // 同玩家繼續擲：清掉 waitingNext、按 rollDice 流程
+  const fresh = await loadRoom();
+  if (!fresh || !fresh.diceState) return;
+  state = fresh;
+  if (state.diceState.playerOrder[state.diceState.currentTurnIdx] !== myPlayerId) {
+    alert('還沒輪到你');
+    return;
+  }
+  state.diceState.waitingNext = null;
+  state.diceState.diceValues = null;
+  await saveRoom();
+  render();
+}
+
+async function advanceToNext() {
+  // 沒命中後按「下一位」（任何在線玩家都能按以加快節奏）
+  const fresh = await loadRoom();
+  if (!fresh || !fresh.diceState) return;
+  state = fresh;
+  const ds = state.diceState;
+
+  // 換下一位玩家
+  ds.currentTurnIdx++;
+  ds.turnDrinks = 0;
+  ds.waitingNext = null;
+  ds.diceValues = null;
+
+  // 檢查這輪是不是結束了
+  if (ds.currentTurnIdx >= ds.playerOrder.length) {
+    // 這輪結束 → 進下一輪 or 遊戲結束
+    if (ds.roundNum >= 5) {
+      // 遊戲結束
+      ds.gameOver = true;
+      state.status = 'ended';
+    } else {
+      ds.roundNum++;
+      ds.diceCount++;
+      ds.killer = Math.floor(Math.random() * 6) + 1;
+      ds.currentTurnIdx = 0;
+      ds.playerOrder = shuffle(state.players.map(p => p.id));  // 重新洗順序
+    }
+  }
+
+  await saveRoom();
+  render();
+}
+
+async function endDiceGame() {
+  const fresh = await loadRoom();
+  if (!fresh) return;
+  state = fresh;
+  state.status = 'ended';
+  if (state.diceState) state.diceState.gameOver = true;
+  await saveRoom();
+  render();
+}
+
+function pickAndSetNewRound(roundNum) {
+  // 抽題（排除已用過的）
+  let available = QUESTIONS.map((q, i) => ({ q, i }))
+    .filter(x => !state.usedIndices.includes(x.i));
+  if (available.length === 0) {
+    state.usedIndices = [];
+    available = QUESTIONS.map((q, i) => ({ q, i }));
+  }
+  const pick = available[Math.floor(Math.random() * available.length)];
+
+  state.currentRound = {
+    roundNum,
+    questionIdx: pick.i,
+    question: { q: pick.q.q, a: pick.q.a, b: pick.q.b, cat: pick.q.cat },
+    answers: {},   // { playerId: { answer: 'a'|'b', guesses: { otherPlayerId: 'a'|'b' } } }
+    startedAt: Date.now(),
+    revealed: false,
+    ackedBy: []
+  };
+  state.usedIndices.push(pick.i);
+}
+
+async function submitMyAnswer(answer, guesses) {
+  // 重撈最新避免覆蓋
+  const fresh = await loadRoom();
+  if (!fresh || !fresh.currentRound) return;
+  state = fresh;
+  if (!state.currentRound.answers) state.currentRound.answers = {};
+  state.currentRound.answers[myPlayerId] = { answer, guesses };
+
+  // 檢查是否所有「在線玩家」都答完
+  const onlinePlayers = state.players.filter(p => p.online);
+  const allAnswered = onlinePlayers.every(p => state.currentRound.answers[p.id]);
+
+  if (allAnswered && !state.currentRound.revealed) {
+    doReveal();
+  }
+
+  await saveRoom();
+  render();
+}
+
+function doReveal() {
+  if (!state.currentRound || state.currentRound.revealed) return;
+  state.currentRound.revealed = true;
+
+  // 計分：每位玩家對每個其他玩家猜對 → +1 分；全猜對 +2 bonus
+  state.players.forEach(p => {
+    const ans = state.currentRound.answers[p.id];
+    if (!ans || ans.timeout) {
+      p.streak = 0;
+      return;
+    }
+    const guesses = ans.guesses || {};
+    const otherPlayers = state.players.filter(other => other.id !== p.id);
+    let correctCount = 0;
+    let totalGuessable = 0;
+    otherPlayers.forEach(other => {
+      const otherAns = state.currentRound.answers[other.id];
+      // 其他人沒答到 → 該對不能計分
+      if (!otherAns || otherAns.timeout || otherAns.answer == null) return;
+      totalGuessable++;
+      if (guesses[other.id] && guesses[other.id] === otherAns.answer) {
+        correctCount++;
+      }
+    });
+    p.score = (p.score || 0) + correctCount;
+    // Perfect bonus：必須有至少 1 個可猜的對象、且全猜對
+    if (totalGuessable > 0 && correctCount === totalGuessable) {
+      p.score += 2;
+      p.lastPerfect = true;
+      p.streak = (p.streak || 0) + 1;
+    } else {
+      p.lastPerfect = false;
+      if (correctCount === 0) p.streak = 0;
+    }
+  });
+
+  // 加入 history
+  if (!state.history) state.history = [];
+  state.history.push({
+    questionIdx: state.currentRound.questionIdx,
+    question: state.currentRound.question,
+    answers: { ...state.currentRound.answers },
+    at: Date.now()
+  });
+  // 只留最近 50 筆
+  if (state.history.length > 50) state.history = state.history.slice(-50);
+}
+
+async function handleTimeout() {
+  // 倒數結束 → 自動送出（如果有選擇）或標記為「沒答」
+  const fresh = await loadRoom();
+  if (!fresh || !fresh.currentRound) return;
+  state = fresh;
+  if (state.currentRound.questionIdx !== myRoundStartedQ) return;
+  if (state.currentRound.revealed) return;
+  if (state.currentRound.answers && state.currentRound.answers[myPlayerId]) return;
+
+  // 超時：盡量保留已選的答案 + 猜測
+  if (!state.currentRound.answers) state.currentRound.answers = {};
+  state.currentRound.answers[myPlayerId] = {
+    answer: pendingAnswer || null,
+    guesses: { ...pendingGuesses },
+    timeout: true
+  };
+
+  // 檢查是否所有人都答完（含超時）
+  const onlinePlayers = state.players.filter(p => p.online);
+  const allDone = onlinePlayers.every(p => state.currentRound.answers[p.id]);
+  if (allDone && !state.currentRound.revealed) {
+    doReveal();
+  }
+
+  myRoundStartedQ = null;
+  myRoundStartTime = null;
+  pendingAnswer = null;
+  pendingGuesses = {};
+  await saveRoom();
+  render();
+}
+
+async function nextRound() {
+  const fresh = await loadRoom();
+  if (!fresh) return;
+  state = fresh;
+  if (!state.currentRound || !state.currentRound.revealed) {
+    // 已經被別人抽下一題了
+    render();
+    return;
+  }
+  if (state.status !== 'playing') return;
+
+  const nextNum = (state.currentRound.roundNum || 0) + 1;
+  pickAndSetNewRound(nextNum);
+  await saveRoom();
+  render();
+}
+
+async function endGame() {
+  const fresh = await loadRoom();
+  if (!fresh) return;
+  state = fresh;
+  state.status = 'ended';
+  await saveRoom();
+  render();
+}
+
+async function restartGame() {
+  const fresh = await loadRoom();
+  if (!fresh) return;
+  state = fresh;
+  state.status = 'waiting';
+  state.currentRound = null;
+  state.usedIndices = [];
+  state.history = [];
+  state.diceState = null;
+  state.players.forEach(p => {
+    p.score = 0;
+    p.streak = 0;
+    p.drinks = 0;
+  });
+  // 不清掉 gameType，讓他們留在同一個遊戲；想換按「換遊戲」
+  await saveRoom();
+  render();
+}
+
+async function leaveRoom() {
+  if (await customConfirm('要離開房間嗎？\n（你的暱稱還會留著，重新進房可以接回）')) {
+    // 標記 offline 但不刪除
+    if (myPlayerId && state) {
+      try {
+        const fresh = await loadRoom();
+        if (fresh) {
+          state = fresh;
+          const idx = state.players.findIndex(p => p.id === myPlayerId);
+          if (idx >= 0) state.players[idx].online = false;
+          await saveRoom();
+        }
+      } catch (e) { /* ignore */ }
+    }
+    if (unsub) { unsub(); unsub = null; }
+    roomCode = null;
+    myPlayerId = null;
+    state = null;
+    render();
+  }
+}
+
+// ============ Countdown ============
+function stopCountdown() {
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+    countdownInterval = null;
+  }
+}
+
+function startCountdown(fillEl, textEl) {
+  stopCountdown();
+  if (!myRoundStartTime) myRoundStartTime = Date.now();
+
+  function tick() {
+    const elapsed = (Date.now() - myRoundStartTime) / 1000;
+    const seconds = Math.max(0, Math.ceil(getRoundTime() - elapsed));
+    const pct = (seconds / getRoundTime()) * 100;
+    fillEl.style.width = pct + '%';
+    if (seconds > 15) fillEl.style.background = 'var(--green)';
+    else if (seconds > 7) fillEl.style.background = 'var(--gold)';
+    else fillEl.style.background = 'var(--red)';
+    textEl.textContent = `${seconds}s`;
+    textEl.style.color = seconds <= 7 ? 'var(--red)' : 'var(--ink)';
+
+    if (elapsed >= getRoundTime()) {
+      stopCountdown();
+      handleTimeout();
+    }
+  }
+
+  tick();
+  countdownInterval = setInterval(tick, 250);
+}
+
+// 離開頁面時標記 offline
+window.addEventListener('beforeunload', () => {
+  if (myPlayerId && state && roomCode) {
+    const idx = state.players.findIndex(p => p.id === myPlayerId);
+    if (idx >= 0) {
+      state.players[idx].online = false;
+      // beforeunload 沒辦法等 async，盡力而為
+      setDoc(doc(db, 'partyRooms', roomCode), state).catch(() => {});
+    }
+  }
+});
+
+// ============ Init ============
+render();
+
+</script>
+</body>
+</html>
